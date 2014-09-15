@@ -59,14 +59,11 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				attachmentColumns[column][row] << attachment;
 			}
 		});
-		System.out.println('before sort');
-		System.out.println(new JsonBuilder(attachmentColumns).toPrettyString());
+
 		attachmentColumns = attachmentColumns.sort();
 		attachmentColumns.each { colNbr, line ->
 			attachmentColumns[colNbr] = line.sort();
 		}
-		System.out.println('after sort');
-		System.out.println(new JsonBuilder(attachmentColumns).toPrettyString());
 	
 		return cleanCollection(attachmentColumns);
 	}
@@ -162,8 +159,6 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				}
 			}
 		}
-		System.out.println('clean collection');
-		System.out.println(new JsonBuilder(clean).toPrettyString());
 		return clean;
 	}
 	
