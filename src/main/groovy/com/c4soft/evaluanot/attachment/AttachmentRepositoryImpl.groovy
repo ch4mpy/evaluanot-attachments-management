@@ -56,13 +56,17 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 					attachmentColumns[column][row] = [];
 				}
 				Attachment attachment = new Attachment(officeId, missionId, bienId, collectionType, matcher[0][3], column, row, matcher[0][4])
-				System.out.println('attachmentColumns[' + column + '][' + row + '] << ' + attachment);
 				attachmentColumns[column][row] << attachment;
 			}
 		});
-		System.out.println('findByOwnerAndCollectionTypeMapByColumnAndRow');
+		System.out.println('before sort');
 		System.out.println(new JsonBuilder(attachmentColumns).toPrettyString());
-		System.out.println('');
+		attachmentColumns = attachmentColumns.sort();
+		attachmentColumns.each { colNbr, line ->
+			attachmentColumns[colNbr] = line.sort();
+		}
+		System.out.println('after sort');
+		System.out.println(new JsonBuilder(attachmentColumns).toPrettyString());
 	
 		return cleanCollection(attachmentColumns);
 	}
@@ -158,9 +162,8 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				}
 			}
 		}
-		System.out.println('cleanCollection');
+		System.out.println('clean collection');
 		System.out.println(new JsonBuilder(clean).toPrettyString());
-		System.out.println('');
 		return clean;
 	}
 	
