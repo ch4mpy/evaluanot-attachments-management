@@ -1,6 +1,7 @@
 package com.c4soft.evaluanot.attachment
 
 import groovy.io.FileType;
+import groovy.json.JsonBuilder;
 
 import java.io.File
 import java.nio.file.FileSystems;
@@ -59,6 +60,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				attachmentColumns[column][row] << attachment;
 			}
 		});
+		System.out.println('findByOwnerAndCollectionTypeMapByColumnAndRow');
+		System.out.println(new JsonBuilder(attachmentColumns).toPrettyString());
+		System.out.println('');
 	
 		return cleanCollection(attachmentColumns);
 	}
@@ -154,6 +158,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				}
 			}
 		}
+		System.out.println('cleanCollection');
+		System.out.println(new JsonBuilder(clean).toPrettyString());
+		System.out.println('');
 		return clean;
 	}
 	
