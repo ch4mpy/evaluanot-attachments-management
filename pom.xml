@@ -66,4 +66,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<scm>
+		<url>https://github.com/ch4mpy/evaluanot-attachments-management.git</url>
+		<developerConnection>https://github.com/ch4mpy/evaluanot-attachments-management.git</developerConnection>
+		<tag>master</tag>
+		<connection>https://github.com/ch4mpy/evaluanot-attachments-management.git</connection>
+	</scm>
 </project>
