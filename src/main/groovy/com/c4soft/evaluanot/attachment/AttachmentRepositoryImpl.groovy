@@ -42,6 +42,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		File missionDir = new File(ownerDir, Long.toString(missionId));
 		File propertyDir = new File(missionDir, Long.toString(bienId));
 		File collectionDir = new File(propertyDir, collectionType.value);
+		List<File> unmatched = [];
 		
 		collectionDir.mkdirs();
 		collectionDir.eachFile(FileType.FILES, {
@@ -57,6 +58,11 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				}
 				Attachment attachment = new Attachment(officeId, missionId, bienId, collectionType, matcher[0][3], column, row, matcher[0][4])
 				attachmentColumns[column][row] << attachment;
+			} else {
+				Matcher m = INPUT_FILE_NAME_PATTERN.matcher(it.name);
+				if(m.matches()) {
+					unmatched << it;
+				}
 			}
 		});
 
@@ -64,8 +70,21 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		attachmentColumns.each { colNbr, line ->
 			attachmentColumns[colNbr] = line.sort();
 		}
+		
+		Map<Integer, Map<Integer, Attachment>> cleaned = cleanCollection(attachmentColumns);
+		
+		if(unmatched && !cleaned[0]) {
+			cleaned[0] = [:];
+		}
+		int offset = cleaned[0]?.size();
+		unmatched.eachWithIndex { file, index ->
+			Matcher m = INPUT_FILE_NAME_PATTERN.matcher(file.name);
+			Attachment attachment = new Attachment(officeId, missionId, bienId, collectionType, m[0][1], 0, offset + index, m[0][2])
+			moveFile(file.toPath(), path(attachment));
+			cleaned[0][offset + index] = attachment;
+		}
 	
-		return cleanCollection(attachmentColumns);
+		return cleaned;
 	}
 
 	public Map<Integer, Map<Integer, Attachment>> create(File file, long officeId, long missionId, long bienId, CollectionType collectionType, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
