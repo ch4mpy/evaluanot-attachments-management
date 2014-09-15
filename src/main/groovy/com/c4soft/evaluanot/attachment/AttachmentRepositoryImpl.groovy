@@ -54,7 +54,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				if(!attachmentColumns[column][row]) {
 					attachmentColumns[column][row] = [];
 				}
-				attachmentColumns[column][row] << new Attachment(officeId, missionId, bienId, collectionType, matcher[0][3], column, row, matcher[0][4]);
+				Attachment attachment = new Attachment(officeId, missionId, bienId, collectionType, matcher[0][3], column, row, matcher[0][4])
+				System.out.println('attachmentColumns[' + column + '][' + row + '] << ' + attachment);
+				attachmentColumns[column][row] << attachment;
 			}
 		});
 	
