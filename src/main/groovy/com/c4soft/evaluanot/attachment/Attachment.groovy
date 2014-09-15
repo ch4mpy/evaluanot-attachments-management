@@ -1,5 +1,7 @@
 package com.c4soft.evaluanot.attachment
 
+import groovy.json.JsonBuilder;
+
 /**
  * @author Ch4mp
  * Evalu@not attached document properties
@@ -92,5 +94,10 @@ class Attachment {
 	    }
 	    return true;
     }
+
+	@Override
+	public String toString() {
+		return new JsonBuilder(this).toPrettyString();
+	}
 	
 }
