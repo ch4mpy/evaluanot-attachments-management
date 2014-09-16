@@ -4,7 +4,7 @@
 
 	<groupId>com.c4soft</groupId>
 	<artifactId>evaluanot-attachments-management</artifactId>
-	<version>0.0.2-RELEASE</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>evaluanot-attachments-management</name>
 	<description>Manage Evalu@not attached documents</description>
@@ -20,6 +20,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
 		<sonar.language>grvy</sonar.language>
+		<sonar.sources>src</sonar.sources>
+		<sonar.groovy.cobertura.reportPath>reports/cobertura.xml</sonar.groovy.cobertura.reportPath>
 	</properties>
 
 	<dependencies>
@@ -40,6 +42,16 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>sonar-project.properties</include>
+				</includes>
+				<targetPath>../..</targetPath>
+			</resource>
+		</resources>
 		<sourceDirectory>src/main/groovy</sourceDirectory>
 		<testSourceDirectory>src/test/groovy</testSourceDirectory>
 		<plugins>
