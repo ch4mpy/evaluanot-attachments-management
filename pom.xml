@@ -22,7 +22,7 @@
 		<sonar.language>grvy</sonar.language>
 		<sonar.sources>src</sonar.sources>
 		<sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.java.coveragePlugin>cobertura</sonar.java.coveragePlugin>
 		<sonar.jacoco.reportPath>target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
 		<sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
