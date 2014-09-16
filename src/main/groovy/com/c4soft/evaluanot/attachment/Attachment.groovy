@@ -1,6 +1,6 @@
 package com.c4soft.evaluanot.attachment
 
-import groovy.json.JsonBuilder;
+import groovy.json.JsonBuilder
 
 /**
  * @author Ch4mp

@@ -1,14 +1,12 @@
 package com.c4soft.evaluanot.attachment;
 
 import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*;
+import static org.junit.Assert.*
 
-import java.nio.file.CopyMoveHelper.CopyOptions;
-import java.nio.file.Files;
-import java.util.Map;
+import java.nio.file.Files
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.Before
+import org.junit.Test
 
 class AttachmentRepositoryImplTest {
 	
