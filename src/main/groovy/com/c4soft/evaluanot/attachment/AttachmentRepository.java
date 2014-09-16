@@ -17,7 +17,7 @@ public interface AttachmentRepository {
 	 * @param collectionType
 	 * @return all attachments from specified collection mapped by display column and display row
 	 */
-	Map<Integer, Map<Integer, Attachment>> findByOwnerAndCollectionTypeMapByColumnAndRow(long officeId, long missionId, long bienId, CollectionType collectionType) throws IllegalArgumentException;
+	Map<Integer, Map<Integer, Attachment>> findByOfficeIdAndMissionIdAndBienIdAndCollectionTypeMapByColumnAndRow(long officeId, long missionId, long bienId, CollectionType collectionType) throws IllegalArgumentException;
 	
 	/**
 	 * Adds an attachment to the repository

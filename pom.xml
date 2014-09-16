@@ -4,7 +4,7 @@
 	
 	<groupId>com.c4soft</groupId>
 	<artifactId>evaluanot-attachments-management</artifactId>
-	<version>0.0.1-RELEASE</version>
+	<version>0.0.2-RELEASE</version>
 	<packaging>jar</packaging>
 	<name>evaluanot-attachments-management</name>
 	<description>Manage Evalu@not attached documents</description>

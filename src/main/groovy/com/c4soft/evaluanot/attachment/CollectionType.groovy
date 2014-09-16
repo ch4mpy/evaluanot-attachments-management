@@ -5,9 +5,11 @@ package com.c4soft.evaluanot.attachment;
  *
  */
 enum CollectionType {
-	MAP('maps'),
-	PICTURE('pictures'),
-	REPORT('reports')
+	PHOTO('photo'),
+	CADASTRE('cadastre'),
+	IGN('ign'),
+	GEOFONCIER('geofoncier'),
+	AUTRE('autre')
 	
 	final String value;
 	

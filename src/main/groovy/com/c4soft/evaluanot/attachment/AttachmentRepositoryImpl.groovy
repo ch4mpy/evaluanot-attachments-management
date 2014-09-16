@@ -36,7 +36,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		this.rootDirectory = rootDirectory;
 	}
 
-	public Map<Integer, Map<Integer, Attachment>> findByOwnerAndCollectionTypeMapByColumnAndRow(long officeId, long missionId, long bienId, CollectionType collectionType) throws IllegalArgumentException {
+	public Map<Integer, Map<Integer, Attachment>> findByOfficeIdAndMissionIdAndBienIdAndCollectionTypeMapByColumnAndRow(long officeId, long missionId, long bienId, CollectionType collectionType) throws IllegalArgumentException {
 		Map<Integer, Map<Integer, List<Attachment>>> attachmentColumns = [:];
 		File ownerDir = new File(rootDirectory, Long.toString(officeId));
 		File missionDir = new File(ownerDir, Long.toString(missionId));
@@ -104,7 +104,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	public Map<Integer, Map<Integer, Attachment>> delete(Attachment attachment) {
-		Map<Integer, Map<Integer, Attachment>> columns = findByOwnerAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
+		Map<Integer, Map<Integer, Attachment>> columns = findByOfficeIdAndMissionIdAndBienIdAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
 		for(int i = attachment.displayRow; i < columns[attachment.displayColumn].size() - 1; i++) {
 			Attachment shifted = columns[attachment.displayColumn][i+1];
 			columns[attachment.displayColumn][i] = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.collectionType, shifted.label, shifted.displayColumn, i, shifted.fileExtension);
@@ -119,7 +119,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		insert(getContent(attachment), new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType, attachment.label, newColumn, newRow, attachment.fileExtension));
 		delete(attachment);
 		
-		return findByOwnerAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
+		return findByOfficeIdAndMissionIdAndBienIdAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
 	}
 
 	public Attachment rename(Attachment attachment, String newLabel) throws AttachmentPersistenceException {
@@ -147,7 +147,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 	
 	private Map<Integer, Map<Integer, Attachment>> insert(File file, Attachment attachment) throws AttachmentPersistenceException {
-		Map<Integer, Map<Integer, Attachment>> columns = findByOwnerAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
+		Map<Integer, Map<Integer, Attachment>> columns = findByOfficeIdAndMissionIdAndBienIdAndCollectionTypeMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.collectionType);
 		for(int i = columns[attachment.displayColumn].size(); i > attachment.displayRow; i--) {
 			Attachment shifted = columns[attachment.displayColumn][i-1];
 			columns[attachment.displayColumn][i] = new Attachment(shifted.officeId, shifted.missionId, shifted.bienId, shifted.collectionType, shifted.label, shifted.displayColumn, i, shifted.fileExtension);
