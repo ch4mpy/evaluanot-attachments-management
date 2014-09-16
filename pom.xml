@@ -21,7 +21,7 @@
 		<java.version>1.7</java.version>
 		<sonar.language>grvy</sonar.language>
 		<sonar.sources>src</sonar.sources>
-		<sonar.cobertura.reportPath>target/site/cobertura/cobertura.xml</sonar.cobertura.reportPath>
+		<sonar.groovy.cobertura.reportPath>target/site/cobertura/cobertura.xml</sonar.groovy.cobertura.reportPath>
 		<cobertura.format>xml</cobertura.format>
 	</properties>
 
