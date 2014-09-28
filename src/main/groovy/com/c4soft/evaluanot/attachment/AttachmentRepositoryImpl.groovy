@@ -249,6 +249,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 	private void copyFile(Path fromPath, Path toPath) throws AttachmentPersistenceException {
 		try {
+			new File(toPath.parent.toString()).mkdirs();
 			Files.copy(fromPath, toPath);
 		} catch(Throwable t) {
 			throw new AttachmentPersistenceException('An error occured while reading from ' + fromPath + ' or writing to ' + toPath, t);
@@ -260,6 +261,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Path fromPath = path(from, format);
 			Path toPath = path(to, format);
 			try {
+				new File(toPath.parent.toString()).mkdirs();
 				Files.move(fromPath, toPath);
 			} catch(Throwable t) {
 				throw new AttachmentPersistenceException('An error occured while reading from ' + fromPath + ' or writing to ' + toPath, t);
