@@ -6,7 +6,7 @@ import groovy.json.JsonBuilder
  * @author Ch4mp
  * Evalu@not attached document properties
  */
-class Attachment {
+class Attachment implements Comparable<Attachment> {
 	
 	final long officeId;
 	
@@ -14,17 +14,17 @@ class Attachment {
 	
 	final long bienId;
 
-	final CollectionType collectionType;
-	
-	final String label;
+	final String collectionType;
 	
 	final int displayRow;
 	
 	final int displayColumn;
 	
+	final String label;
+	
 	final String fileExtension;
 
-	public Attachment(long officeId, long missionId, long bienId, CollectionType collectionType, String label, int displayColumn, int displayRow, String fileExtension) {
+	public Attachment(long officeId, long missionId, long bienId, String collectionType, String label, int displayColumn, int displayRow, String fileExtension) {
 	    super();
 	    this.officeId = officeId;
 	    this.missionId = missionId;
@@ -44,10 +44,10 @@ class Attachment {
 	    result = prime * result + missionId;
 	    result = prime * result + bienId;
 	    result = prime * result + ((collectionType == null) ? 0 : collectionType.hashCode());
-	    result = prime * result + displayColumn;
 	    result = prime * result + displayRow;
-	    result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
+	    result = prime * result + displayColumn;
 	    result = prime * result + ((label == null) ? 0 : label.hashCode());
+	    result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
 	    return result;
     }
 
@@ -59,45 +59,71 @@ class Attachment {
 	    if (getClass() != obj.getClass()) {
 		    return false;
 	    }
-	    Attachment other = (Attachment) obj;
-	    if (officeId != other.officeId) {
-		    return false;
-	    }
-	    if (missionId != other.missionId) {
-		    return false;
-	    }
-	    if (bienId != other.bienId) {
-		    return false;
-	    }
-	    if (collectionType != other.collectionType) {
-		    return false;
-	    }
-		if (displayColumn != other.displayColumn) {
-		    return false;
-		}
-		if (displayRow != other.displayRow) {
-		    return false;
-		}
-		if (fileExtension == null) {
-		    if (other.fileExtension != null) {
-			    return false;
-		    }
-	    } else if (!fileExtension.equals(other.fileExtension)) {
-		    return false;
-	    }
-	    if (label == null) {
-		    if (other.label != null) {
-			    return false;
-		    }
-	    } else if (!label.equals(other.label)) {
-		    return false;
-	    }
-	    return true;
+	    return compareTo((Attachment) obj) == 0;
     }
 
 	@Override
 	public String toString() {
 		return new JsonBuilder(this).toPrettyString();
+	}
+
+	@Override
+	public int compareTo(Attachment o) {
+		if(!o) {
+			return 1;
+		}
+		if(officeId > o.officeId) {
+			return 1;
+		}
+		if(officeId < o.officeId) {
+			return -1;
+		}
+		if(missionId > o.missionId) {
+			return 1;
+		}
+		if(missionId < o.missionId) {
+			return -1;
+		}
+		if(bienId > o.bienId) {
+			return 1;
+		}
+		if(bienId < o.bienId) {
+			return -1;
+		}
+		if(collectionType != o.collectionType) {
+			if(collectionType) {
+				return collectionType.compareTo(o.collectionType);
+			} else {
+				return -1;
+			}
+		}
+		if(displayColumn > o.displayColumn) {
+			return 1;
+		}
+		if(displayColumn < o.displayColumn) {
+			return -1;
+		}
+		if(displayRow > o.displayRow) {
+			return 1;
+		}
+		if(displayRow < o.displayRow) {
+			return -1;
+		}
+		if(label != o.label) {
+			if(label) {
+				return label.compareTo(o.label);
+			} else {
+				return -1;
+			}
+		}
+		if(fileExtension != o.fileExtension) {
+			if(fileExtension) {
+				return fileExtension.compareTo(o.fileExtension);
+			} else {
+				return -1;
+			}
+		}
+		return 0;
 	}
 	
 }
