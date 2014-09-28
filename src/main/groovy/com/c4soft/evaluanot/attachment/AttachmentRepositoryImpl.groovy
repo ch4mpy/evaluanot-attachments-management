@@ -3,9 +3,11 @@ package com.c4soft.evaluanot.attachment
 import groovy.io.FileType
 
 import java.io.File;
+import java.nio.file.CopyOption;
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher
@@ -250,7 +252,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private void copyFile(Path fromPath, Path toPath) throws AttachmentPersistenceException {
 		try {
 			new File(toPath.parent.toString()).mkdirs();
-			Files.copy(fromPath, toPath);
+			Files.copy(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
 		} catch(Throwable t) {
 			throw new AttachmentPersistenceException('An error occured while reading from ' + fromPath + ' or writing to ' + toPath, t);
 		}
@@ -262,7 +264,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Path toPath = path(to, format);
 			try {
 				new File(toPath.parent.toString()).mkdirs();
-				Files.move(fromPath, toPath);
+				Files.move(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
 			} catch(Throwable t) {
 				throw new AttachmentPersistenceException('An error occured while reading from ' + fromPath + ' or writing to ' + toPath, t);
 			}
