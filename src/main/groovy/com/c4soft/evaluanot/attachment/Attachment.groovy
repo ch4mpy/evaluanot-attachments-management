@@ -14,7 +14,7 @@ class Attachment implements Comparable<Attachment> {
 	
 	final long bienId;
 
-	final String collectionType;
+	final Gallery gallery;
 	
 	final int displayRow;
 	
@@ -24,12 +24,12 @@ class Attachment implements Comparable<Attachment> {
 	
 	final String fileExtension;
 
-	public Attachment(long officeId, long missionId, long bienId, String collectionType, String label, int displayColumn, int displayRow, String fileExtension) {
+	public Attachment(long officeId, long missionId, long bienId, Gallery gallery, String label, int displayColumn, int displayRow, String fileExtension) {
 	    super();
 	    this.officeId = officeId;
 	    this.missionId = missionId;
 	    this.bienId = bienId;
-	    this.collectionType = collectionType;
+	    this.gallery = gallery;
 	    this.label = label;
 	    this.displayColumn = displayColumn;
 	    this.displayRow = displayRow;
@@ -43,7 +43,7 @@ class Attachment implements Comparable<Attachment> {
 	    result = prime * result + officeId;
 	    result = prime * result + missionId;
 	    result = prime * result + bienId;
-	    result = prime * result + ((collectionType == null) ? 0 : collectionType.hashCode());
+	    result = prime * result + ((gallery == null) ? 0 : gallery.hashCode());
 	    result = prime * result + displayRow;
 	    result = prime * result + displayColumn;
 	    result = prime * result + ((label == null) ? 0 : label.hashCode());
@@ -90,9 +90,9 @@ class Attachment implements Comparable<Attachment> {
 		if(bienId < o.bienId) {
 			return -1;
 		}
-		if(collectionType != o.collectionType) {
-			if(collectionType) {
-				return collectionType.compareTo(o.collectionType);
+		if(gallery != o.gallery) {
+			if(gallery) {
+				return gallery.compareTo(o.gallery);
 			} else {
 				return -1;
 			}
