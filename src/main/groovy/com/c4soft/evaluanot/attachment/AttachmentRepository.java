@@ -65,4 +65,15 @@ public interface AttachmentRepository {
 	 * @return actual attached file from the file system
 	 */
 	Map<String, File> getContentByFormat(Attachment attachment) throws IllegalArgumentException, AttachmentPersistenceException;
+	
+	/**
+	 * Set which attached document should be the report cover
+	 * @param attachment
+	 */
+	void setCover(Attachment attachment);
+	
+	/**
+	 * @return report cover as previously set
+	 */
+	Attachment getCover(long officeId, long missionId, long bienId);
 }

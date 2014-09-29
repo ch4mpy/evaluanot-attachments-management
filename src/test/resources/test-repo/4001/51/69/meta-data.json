@@ -1,0 +1,14 @@
+{
+    "cover": {
+        "bienId": 69,
+        "officeId": 4001,
+        "displayRow": 0,
+        "gallery": {
+            "name": "photo"
+        },
+        "label": "Belle montagne",
+        "displayColumn": 1,
+        "missionId": 51,
+        "fileExtension": "JPG"
+    }
+}
