@@ -70,7 +70,7 @@ public interface AttachmentRepository {
 	 * Set which attached document should be the report cover
 	 * @param attachment
 	 */
-	void setCover(Attachment attachment);
+	void setCover(long officeId, long missionId, long bienId, Attachment attachment);
 	
 	/**
 	 * @return report cover as previously set

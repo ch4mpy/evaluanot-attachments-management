@@ -116,7 +116,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
 		if(cover == attachment) {
-			setCover(null);
+			setCover(attachment.officeId, attachment.missionId, attachment.bienId, null);
 		}
 		
 		formats.each { format ->
@@ -127,7 +127,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Entry<Attachment, Set<Format>> shifted = columns[attachment.displayColumn][i+1];
 			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
 			if(cover == shifted) {
-				setCover(newAttachment);
+				setCover(attachment.officeId, attachment.missionId, attachment.bienId, newAttachment);
 			}
 			columns[attachment.displayColumn][i] = [(newAttachment) : shifted.value].entrySet().first();
 			shifted.value.each { format ->
@@ -160,7 +160,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
 		if(cover?.displayColumn == newAttachment.displayColumn && cover?.displayRow == newAttachment.displayRow && cover?.gallery == newAttachment.gallery) {
-			setCover(newAttachment);
+			setCover(attachment.officeId, attachment.missionId, attachment.bienId, newAttachment);
 		}
 
 		moveFiles(attachment, newAttachment, getContentByFormat(attachment).keySet());
@@ -174,8 +174,12 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	@Override
-	public void setCover(Attachment attachment) {
-		File metaDataFile = getMetaDataFile(attachment.officeId, attachment.missionId, attachment.bienId);
+	public void setCover(long officeId, long missionId, long bienId, Attachment attachment) {
+		if(attachment && (attachment.officeId != officeId || attachment.bienId != bienId || attachment.bienId != bienId)) {
+			return;
+		}
+		
+		File metaDataFile = getMetaDataFile(officeId, missionId, bienId);
 		BienMetaData metaData = parseMetaData(metaDataFile);
 		metaData.cover = attachment;
 		
@@ -267,7 +271,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				moveFiles(before, after, columns[attachment.displayColumn][i-1].value);
 				
 				if(before == cover) {
-					setCover(after);
+					setCover(attachment.officeId, attachment.missionId, attachment.bienId, after);
 				}
 			}
 			columns[attachment.displayColumn][attachment.displayRow] = [(attachment) : (Set<Format>)[format]].entrySet().first();
@@ -326,7 +330,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(ref) {
 			Attachment cover = getCover(ref.officeId, ref.missionId, ref.bienId);
 			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key != cover) {
-				setCover(null);
+				setCover(ref.officeId, ref.missionId, ref.bienId, null);
 			}
 		}
 		

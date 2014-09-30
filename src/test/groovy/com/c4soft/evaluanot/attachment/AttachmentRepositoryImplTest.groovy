@@ -42,7 +42,7 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatValidCollectionsAreLoadedWithoutModifications() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(4001L, 51L, 69L, PHOTO);
-		repo.setCover(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
+		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual.size(), is (2));
 		assertThat(actual[0].size(), is (1));
 		
