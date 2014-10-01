@@ -3,11 +3,8 @@ package com.c4soft.evaluanot.attachment;
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
 
-import java.io.File;
 import java.nio.file.Files
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.Map.Entry
 
 import org.junit.Before
 import org.junit.Test

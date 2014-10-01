@@ -1,18 +1,14 @@
 package com.c4soft.evaluanot.attachment
 
 import groovy.io.FileType
-import groovy.json.JsonBuilder;
-import groovy.json.JsonSlurper;
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 
-import java.io.File;
-import java.nio.file.CopyOption;
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.nio.file.StandardCopyOption
+import java.util.Map.Entry
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
