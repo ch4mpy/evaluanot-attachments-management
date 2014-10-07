@@ -1,9 +1,7 @@
 package com.c4soft.evaluanot.attachment
 
-import groovy.json.JsonBuilder;
 
-class BienMetaData {
+class BienMetaData implements Serializable {
 
 	Attachment cover;
-	
 }

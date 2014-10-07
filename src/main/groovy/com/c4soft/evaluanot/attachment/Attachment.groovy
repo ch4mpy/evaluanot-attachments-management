@@ -6,61 +6,61 @@ import groovy.json.JsonBuilder
  * @author Ch4mp
  * Evalu@not attached document properties
  */
-class Attachment implements Comparable<Attachment> {
-	
+class Attachment implements Comparable<Attachment>, Serializable {
+
 	final long officeId;
-	
+
 	final long missionId;
-	
+
 	final long bienId;
 
 	final Gallery gallery;
-	
+
 	final int displayRow;
-	
+
 	final int displayColumn;
-	
+
 	final String label;
-	
+
 	final String fileExtension;
 
 	public Attachment(long officeId, long missionId, long bienId, Gallery gallery, String label, int displayColumn, int displayRow, String fileExtension) {
-	    super();
-	    this.officeId = officeId;
-	    this.missionId = missionId;
-	    this.bienId = bienId;
-	    this.gallery = gallery;
-	    this.label = label;
-	    this.displayColumn = displayColumn;
-	    this.displayRow = displayRow;
-	    this.fileExtension = fileExtension;
-    }
+		super();
+		this.officeId = officeId;
+		this.missionId = missionId;
+		this.bienId = bienId;
+		this.gallery = gallery;
+		this.label = label;
+		this.displayColumn = displayColumn;
+		this.displayRow = displayRow;
+		this.fileExtension = fileExtension;
+	}
 
 	@Override
-    public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result + officeId;
-	    result = prime * result + missionId;
-	    result = prime * result + bienId;
-	    result = prime * result + ((gallery == null) ? 0 : gallery.hashCode());
-	    result = prime * result + displayRow;
-	    result = prime * result + displayColumn;
-	    result = prime * result + ((label == null) ? 0 : label.hashCode());
-	    result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
-	    return result;
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + officeId;
+		result = prime * result + missionId;
+		result = prime * result + bienId;
+		result = prime * result + ((gallery == null) ? 0 : gallery.hashCode());
+		result = prime * result + displayRow;
+		result = prime * result + displayColumn;
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
+		return result;
+	}
 
 	@Override
-    public boolean equals(Object obj) {
-	    if (obj == null) {
-		    return false;
-	    }
-	    if (getClass() != obj.getClass()) {
-		    return false;
-	    }
-	    return compareTo((Attachment) obj) == 0;
-    }
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		return compareTo((Attachment) obj) == 0;
+	}
 
 	@Override
 	public String toString() {
@@ -125,5 +125,4 @@ class Attachment implements Comparable<Attachment> {
 		}
 		return 0;
 	}
-	
 }
