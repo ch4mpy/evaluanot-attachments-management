@@ -302,28 +302,24 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	private Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> cleanCollection(Map<String, Map<Attachment, Set<Format>>> dirty) throws AttachmentPersistenceException {
-		Map<Integer, Map<Integer, Map<Attachment, Set<Format>>>> dirtyByPosition = [:];
+		SortedMap<Integer, SortedMap<Integer, SortedMap<Attachment, SortedSet<Format>>>> dirtyByPosition = new TreeMap();
 		Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> clean = [:];
 		Attachment ref;
 
 		dirty.each { label, formatsByPosition ->
 			ref = formatsByPosition.keySet().first();
 			if(!dirtyByPosition[ref.displayColumn]) {
-				dirtyByPosition[ref.displayColumn] = [:];
+				dirtyByPosition[ref.displayColumn] = new TreeMap();
 			}
 			if(!dirtyByPosition[ref.displayColumn][ref.displayRow]) {
-				dirtyByPosition[ref.displayColumn][ref.displayRow] = [:];
+				dirtyByPosition[ref.displayColumn][ref.displayRow] = new TreeMap();
 			}
 			if(!dirtyByPosition[ref.displayColumn][ref.displayRow][ref]) {
-				dirtyByPosition[ref.displayColumn][ref.displayRow][ref] = (Set<Format>)[];
+				dirtyByPosition[ref.displayColumn][ref.displayRow][ref] = new TreeSet();
 			}
 			formatsByPosition.each { attachment, formats ->
 				dirtyByPosition[ref.displayColumn][ref.displayRow][ref].addAll(formats);
 			}
-		}
-		dirtyByPosition.sort();
-		dirtyByPosition.each { columnNbr, line ->
-			line.sort();
 		}
 
 		dirtyByPosition.each { columnNbr, line ->
