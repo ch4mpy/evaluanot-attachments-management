@@ -13,7 +13,7 @@ class AttachmentTest {
 	@Test
 	public void testHashCode() {
 		Attachment attachment = new Attachment(4001L, 51L, 69L, PHOTOS, 'image', 0, 1, 'jpg');
-		assertThat(attachment.hashCode(), is(-1955962060));
+		assertThat(attachment.hashCode(), is(531550773));
 	}
 
 	@Test
@@ -62,13 +62,15 @@ class AttachmentTest {
 
 	@Test
 	public void testToString() {
-		assertThat(new Attachment(4001L, 51L, 69L, PHOTOS, 'image', 1, 2, 'jpg').toString(), is(/{
+		assertEquals(/{
     "bienId": 69,
     "officeId": 4001,
     "displayRow": 2,
     "gallery": {
         "formats": [
             {
+                "maxHeight": null,
+                "maxWidth": null,
                 "name": "binary"
             }
         ],
@@ -78,6 +80,6 @@ class AttachmentTest {
     "displayColumn": 1,
     "missionId": 51,
     "fileExtension": "jpg"
-}/));
+}/, new Attachment(4001L, 51L, 69L, PHOTOS, 'image', 1, 2, 'jpg').toString());
 	}
 }

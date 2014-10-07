@@ -8,6 +8,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.util.Map;
 import java.util.Map.Entry
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -32,12 +33,15 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private static final String META_DATA_FILE = 'meta-data.json';
 
 	final File rootDirectory;
+	
+	final String servletDocumentsPath;
 
-	public AttachmentRepositoryImpl(File rootDirectory) {
+	public AttachmentRepositoryImpl(File rootDirectory, String servletDocumentsPath) {
 		rootDirectory.mkdirs();
 		this.rootDirectory = rootDirectory;
+		this.servletDocumentsPath = servletDocumentsPath;
 	}
-	
+
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(long officeId, long missionId, long bienId, Gallery gallery) throws IllegalArgumentException {
 		File ownerDir = new File(rootDirectory, Long.toString(officeId));
@@ -70,21 +74,21 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 		return cleanCollection(attachmentsByLabel);
 	}
-	
+
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> create(Map<Format, File> fileByFormat, long officeId, long missionId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
 		if(! fileByFormat) {
 			return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(officeId, missionId, bienId, gallery);
 		}
-		
+
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns;
 		fileByFormat.each { format, file ->
 			columns = insert(format, file,  officeId, missionId, bienId, gallery, label, column, row);
 		}
-		
+
 		return columns;
 	}
-	
+
 	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(Format format, File file, long officeId, long missionId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
 		if(!file?.isFile()) {
 			throw new IllegalArgumentException('provided file ' + file?.name + ' is not valid');
@@ -100,25 +104,25 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, label, column, row, inputMatcher[0][2]);
 		return insert(format, file, attachment);
 	}
-	
+
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> delete(Attachment attachment) {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
 		Set<Format> formats = columns[attachment.displayColumn][attachment.displayRow].value;
-		
+
 		if(attachment != columns[attachment.displayColumn][attachment.displayRow].key) {
 			return columns;
 		}
-		
+
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
 		if(cover == attachment) {
 			setCover(attachment.officeId, attachment.missionId, attachment.bienId, null);
 		}
-		
+
 		formats.each { format ->
-			Files.delete(path(attachment, format));
+			Files.delete(fsPath(attachment, format));
 		}
-		
+
 		for(int i = attachment.displayRow; i < columns[attachment.displayColumn].size() - 1; i++) {
 			Entry<Attachment, Set<Format>> shifted = columns[attachment.displayColumn][i+1];
 			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
@@ -127,14 +131,14 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			}
 			columns[attachment.displayColumn][i] = [(newAttachment) : shifted.value].entrySet().first();
 			shifted.value.each { format ->
-				Files.move(path(shifted.key, format), path(newAttachment, format));
+				Files.move(fsPath(shifted.key, format), fsPath(newAttachment, format));
 			}
 		}
 		columns[attachment.displayColumn].remove(columns[attachment.displayColumn].size() - 1);
-		
+
 		return columns;
 	}
-	
+
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> move(Attachment attachment, int newColumn, int newRow) throws AttachmentPersistenceException {
 		Map<Format, File> contentByFormat = getContentByFormat(attachment);
@@ -145,15 +149,15 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 		return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
 	}
-	
+
 	@Override
 	public Attachment rename(Attachment attachment, String newLabel) throws AttachmentPersistenceException {
 		if(!newLabel) {
 			throw new IllegalArgumentException("new name can't be empty");
 		}
-		
+
 		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, newLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
-		
+
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
 		if(cover?.displayColumn == newAttachment.displayColumn && cover?.displayRow == newAttachment.displayRow && cover?.gallery == newAttachment.gallery) {
 			setCover(attachment.officeId, attachment.missionId, attachment.bienId, newAttachment);
@@ -162,11 +166,30 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		moveFiles(attachment, newAttachment, getContentByFormat(attachment).keySet());
 		return newAttachment;
 	}
-	
+
 	@Override
 	public Map<Format, File> getContentByFormat(Attachment attachment) {
-		Path collectionPath = collectionPath(attachment);
-		return listFormats(new File(collectionPath.toString()), attachment);
+		Path collectionPath = collectionPath(rootDirectory.absolutePath, attachment);
+		return getFilesByFormats(new File(collectionPath.toString()), attachment);
+	}
+
+	@Override
+	public Map<Format, String> getServletPathByFormat(Attachment attachment) throws IllegalArgumentException, AttachmentPersistenceException {
+		Path collectionPath = collectionPath(rootDirectory.absolutePath, attachment);
+		File collectionDir = new File(collectionPath.toString());
+		Map<Format, String> formats = [:];
+		String repoFileName = repoFileName(attachment);
+		String collectionServletPath = servletDocumentsPath;
+		collectionServletPath += '/';
+		collectionServletPath += (collectionDir.absolutePath - rootDirectory.absolutePath).replaceAll(/[\\]/, '/');
+		collectionServletPath += '/';
+		collectionServletPath = collectionServletPath.replaceAll('/+', '/');
+		collectionDir.eachDir { formatDir ->
+			formatDir.eachFileMatch(repoFileName) {
+				formats[new Format(formatDir.name)] = collectionServletPath + formatDir.name + '/' + repoFileName;
+			}
+		}
+		return formats;
 	}
 
 	@Override
@@ -174,11 +197,11 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(attachment && (attachment.officeId != officeId || attachment.bienId != bienId || attachment.bienId != bienId)) {
 			return;
 		}
-		
+
 		File metaDataFile = getMetaDataFile(officeId, missionId, bienId);
 		BienMetaData metaData = parseMetaData(metaDataFile);
 		metaData.cover = attachment;
-		
+
 		if(!metaDataFile.isFile()) {
 			metaDataFile.createNewFile();
 		}
@@ -191,7 +214,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		BienMetaData metaData = parseMetaData(metaDataFile);
 		return metaData.cover;
 	}
-	
+
 	private File getMetaDataFile(long officeId, long missionId, long bienId) {
 		File officeDir = new File(rootDirectory.absolutePath, Long.toString(officeId));
 		File missionDir = new File(officeDir, Long.toString(missionId));
@@ -199,10 +222,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		bienDir.mkdirs();
 		return new File(bienDir, META_DATA_FILE);
 	}
-	
+
 	private BienMetaData parseMetaData(File metaDataFile) {
 		BienMetaData metaData;
-		
+
 		if(metaDataFile.isFile()) {
 			Object raughData = new JsonSlurper().parse(metaDataFile);
 			Attachment cover;
@@ -215,15 +238,15 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		} else {
 			metaData = new BienMetaData();
 		}
-		
+
 		return metaData;
 	}
 
-	private Path collectionPath(Attachment attachment) {
+	private Path collectionPath(String root, Attachment attachment) {
 		if(!attachment) {
 			return null;
 		}
-		return FileSystems.getDefault().getPath(rootDirectory.absolutePath, Long.toString(attachment.officeId), Long.toString(attachment.missionId), Long.toString(attachment.bienId), attachment.gallery.name);
+		return FileSystems.getDefault().getPath(root, Long.toString(attachment.officeId), Long.toString(attachment.missionId), Long.toString(attachment.bienId), attachment.gallery.name);
 	}
 
 	private String repoFileName(Attachment attachment) {
@@ -233,7 +256,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		return attachment.displayColumn + '_' + attachment.displayRow + '_' + attachment.label + '.' + attachment.fileExtension;
 	}
 
-	private Map<Format, File> listFormats(File collectionDir, Attachment attachment) {
+	private Map<Format, File> getFilesByFormats(File collectionDir, Attachment attachment) {
 		Map<Format, File> formats = [:];
 		String repoFileName = repoFileName(attachment);
 		collectionDir.eachDir { formatDir ->
@@ -244,8 +267,8 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		return formats;
 	}
 
-	private Path path(Attachment attachment, Format format) throws AttachmentPersistenceException {
-		String collectionPath = collectionPath(attachment)?.toString();
+	private Path fsPath(Attachment attachment, Format format) throws AttachmentPersistenceException {
+		String collectionPath = collectionPath(rootDirectory.absolutePath, attachment)?.toString();
 		String repoFileName =  repoFileName(attachment);
 		return FileSystems.getDefault().getPath(collectionPath, format.toString(), repoFileName);
 	}
@@ -253,7 +276,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(Format format, File file, Attachment attachment) throws AttachmentPersistenceException {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
-		
+
 		if(!columns[attachment.displayColumn]) {
 			columns[attachment.displayColumn] = [:];
 		}
@@ -265,15 +288,15 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				Attachment after = new Attachment(before.officeId, before.missionId, before.bienId, before.gallery, before.label, before.displayColumn, i, before.fileExtension);
 				columns[attachment.displayColumn][i] = [(after) : columns[attachment.displayColumn][i-1].value].entrySet().first();
 				moveFiles(before, after, columns[attachment.displayColumn][i-1].value);
-				
+
 				if(before == cover) {
 					setCover(attachment.officeId, attachment.missionId, attachment.bienId, after);
 				}
 			}
 			columns[attachment.displayColumn][attachment.displayRow] = [(attachment) : (Set<Format>)[format]].entrySet().first();
 		}
-		
-		copyFile(file.toPath(), path(attachment, format));
+
+		copyFile(file.toPath(), fsPath(attachment, format));
 
 		return columns;
 	}
@@ -302,12 +325,12 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		dirtyByPosition.each { columnNbr, line ->
 			line.sort();
 		}
-		
+
 		dirtyByPosition.each { columnNbr, line ->
 			if(!clean[columnNbr]) {
 				clean[columnNbr] = [:];
 			}
-			
+
 			line.eachWithIndex { rowNbr, attachments, lineIndex ->
 				attachments.eachWithIndex { attachment, formats, i ->
 					Map<Attachment, Set<Format>> tmp;
@@ -322,14 +345,14 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				}
 			}
 		}
-		
+
 		if(ref) {
 			Attachment cover = getCover(ref.officeId, ref.missionId, ref.bienId);
 			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key != cover) {
 				setCover(ref.officeId, ref.missionId, ref.bienId, null);
 			}
 		}
-		
+
 		return clean;
 	}
 
@@ -344,8 +367,8 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 	private void moveFiles(Attachment from, Attachment to, Set<Format> formats) throws AttachmentPersistenceException {
 		formats.each {	format ->
-			Path fromPath = path(from, format);
-			Path toPath = path(to, format);
+			Path fromPath = fsPath(from, format);
+			Path toPath = fsPath(to, format);
 			try {
 				new File(toPath.parent.toString()).mkdirs();
 				Files.move(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);

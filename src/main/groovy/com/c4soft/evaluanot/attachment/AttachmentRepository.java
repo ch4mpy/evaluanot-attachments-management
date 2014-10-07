@@ -75,6 +75,14 @@ public interface AttachmentRepository {
 			AttachmentPersistenceException;
 
 	/**
+	 * Retrieve the servlet path to access the resource (indexed by format: fullsize, thumbnail, ...).
+	 * @param attachment
+	 * @return actual attached file servlet path
+	 */
+	Map<Format, String> getServletPathByFormat(Attachment attachment) throws IllegalArgumentException,
+			AttachmentPersistenceException;
+
+	/**
 	 * Set which attached document should be the report cover
 	 * @param attachment
 	 */

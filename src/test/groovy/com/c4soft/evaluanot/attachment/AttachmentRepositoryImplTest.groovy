@@ -23,7 +23,7 @@ class AttachmentRepositoryImplTest {
 
 	@Before
 	public void before() {
-		repo = new AttachmentRepositoryImpl(new File('target/attachmentRepo'));
+		repo = new AttachmentRepositoryImpl(new File('target/attachmentRepo'), '/documents/');
 		repo.rootDirectory.deleteDir();
 		repo.rootDirectory.mkdirs();
 		testDataDir.eachFileRecurse {
@@ -124,9 +124,17 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testListFormats() {
 		File photoDir = new File(repo.rootDirectory, '4001/51/69/photo');
-		Map<Format, File> actual = repo.listFormats(photoDir, new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
+		Map<Format, File> actual = repo.getFilesByFormats(photoDir, new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual.size(), is(1));
 		assertThat(actual[FULLSIZE].path, containsString('1_0_Belle montagne.JPG'));
 		assertThat(actual[FULLSIZE].path, containsString(FULLSIZE.name));
+	}
+	
+	@Test
+	public void testGetServletPathsByFormat() {
+		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'));
+		assertThat(actual.size(), is(2));
+		assertEquals('/documents/4001/51/69/photo/fullsize/1_1_eyes-wide-open.JPG', actual[FULLSIZE]);
+		assertEquals('/documents/4001/51/69/photo/thumbnail/1_1_eyes-wide-open.JPG', actual[THUMBNAIL]);
 	}
 }
