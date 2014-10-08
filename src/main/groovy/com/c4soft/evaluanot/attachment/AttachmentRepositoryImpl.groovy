@@ -42,6 +42,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		this.servletDocumentsPath = servletDocumentsPath;
 	}
 
+	public AttachmentRepositoryImpl(String rootDirectoryPath, String servletDocumentsPath) {
+		this(new File(rootDirectoryPath), servletDocumentsPath);
+	}
+
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(long officeId, long missionId, long bienId, Gallery gallery) throws IllegalArgumentException {
 		File ownerDir = new File(rootDirectory, Long.toString(officeId));
