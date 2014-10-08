@@ -132,9 +132,8 @@ class AttachmentRepositoryImplTest {
 	
 	@Test
 	public void testGetServletPathsByFormat() {
-		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'));
-		assertThat(actual.size(), is(2));
-		assertEquals('/documents/4001/51/69/photo/fullsize/1_1_eyes-wide-open.JPG', actual[FULLSIZE]);
-		assertEquals('/documents/4001/51/69/photo/thumbnail/1_1_eyes-wide-open.JPG', actual[THUMBNAIL]);
+		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG'));
+		assertThat(actual.size(), is(1));
+		assertEquals('/documents/4001/51/69/photo/fullsize/0_0_virage+%C3%A0+droite.JPG', actual[FULLSIZE]);
 	}
 }

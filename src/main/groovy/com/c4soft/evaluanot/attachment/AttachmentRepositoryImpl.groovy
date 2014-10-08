@@ -48,7 +48,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		File missionDir = new File(ownerDir, Long.toString(missionId));
 		File propertyDir = new File(missionDir, Long.toString(bienId));
 		File collectionDir = new File(propertyDir, gallery.name);
-		Map<String, Map<Attachment, Set<Format>>> attachmentsByLabel = [:];
+		Map<String, Map<Attachment, Set<Format>>> attachmentsByLabel = new TreeMap();
 
 		collectionDir.mkdirs();
 		collectionDir.eachDir { formatDir ->
@@ -186,7 +186,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		collectionServletPath = collectionServletPath.replaceAll('/+', '/');
 		collectionDir.eachDir { formatDir ->
 			formatDir.eachFileMatch(repoFileName) {
-				formats[new Format(formatDir.name)] = collectionServletPath + formatDir.name + '/' + repoFileName;
+				formats[new Format(formatDir.name)] = collectionServletPath + formatDir.name + '/' + java.net.URLEncoder.encode(repoFileName, 'UTF-8');
 			}
 		}
 		return formats;
