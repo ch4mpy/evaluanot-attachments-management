@@ -24,9 +24,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	 * Third group is attachment label
 	 * Last group is file extension
 	 */
-	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d)+_(\d)+_([\w\séèêàçù_\-\.]+)\.(\w+)$/;
+	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d)+_(\d)+_([\w\séèêàçù_\-\.\(\)]+)\.(\w+)$/;
 
-	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\séèêàçù_\-\.]+$/;
+	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\séèêàçù_\-\.\(\)]+$/;
 
 	private static final Pattern INPUT_FILE_NAME_PATTERN = ~/^(.+)\.(\w+)$/
 
@@ -102,7 +102,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			throw new IllegalArgumentException('provided file name must be composed of a name and an extension');
 		}
 		if(!REPO_FILE_LABEL_PATTERN.matcher(label).matches()) {
-			throw new IllegalArgumentException('label can only be composed of latin1 characters, spaces, digits, underscores, dashes and dots');
+			throw new IllegalArgumentException('label can only be composed of latin1 characters, spaces, digits, underscores, dashes, dots and parenthesis');
 		}
 
 		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, label, column, row, inputMatcher[0][2]);
