@@ -1,5 +1,7 @@
 package com.c4soft.evaluanot.attachment
 
+import groovy.json.JsonBuilder;
+
 
 
 class Gallery implements Comparable<Gallery>, Serializable {
@@ -21,7 +23,7 @@ class Gallery implements Comparable<Gallery>, Serializable {
 
 	@Override
 	public String toString() {
-		return name;
+		return new JsonBuilder(this).toPrettyString();
 	}
 
 	@Override

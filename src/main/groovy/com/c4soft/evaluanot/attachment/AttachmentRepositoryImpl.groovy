@@ -234,7 +234,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Object raughData = new JsonSlurper().parse(metaDataFile);
 			Attachment cover;
 			try {
-				cover = new Attachment(raughData.cover.officeId, raughData.cover.missionId, raughData.cover.bienId, new Gallery(raughData.cover.gallery.name), raughData.cover.label, raughData.cover.displayColumn, raughData.cover.displayRow, raughData.cover.fileExtension);
+				cover = new Attachment(raughData.cover.officeId, raughData.cover.missionId, raughData.cover.bienId, new Gallery(raughData.cover.gallery.name, raughData.cover.gallery.formats), raughData.cover.label, raughData.cover.displayColumn, raughData.cover.displayRow, raughData.cover.fileExtension);
 			} catch(Throwable t) {
 				cover = null;
 			}
