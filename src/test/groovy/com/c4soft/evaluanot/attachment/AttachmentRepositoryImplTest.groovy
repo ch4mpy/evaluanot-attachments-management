@@ -76,10 +76,10 @@ class AttachmentRepositoryImplTest {
 
 	@Test
 	public void testThatCreateInExistingColumnMovesExistingAttachments() {
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File('target/test-classes/moto_(1).jpg')], 4001L, 51L, 69L, PHOTO, 'monster (2)', 1, 1);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
 		assertThat(actual[1].size(), is (3));
 		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG')));
-		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'monster (2)', 1, 1, 'jpg')));
+		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1, 'jpg'), actual[1][1].key);
 		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 2, 'JPG')));
 	}
 
