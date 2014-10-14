@@ -24,7 +24,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	 * Third group is attachment label
 	 * Last group is file extension
 	 */
-	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d)+_(\d)+_([\w\séèêàçù_\-\.\(\)\[\]\{\}']+)\.(\w+)$/;
+	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\séèêàçù_\-\.\(\)\[\]\{\}']+)\.(\w+)$/;
 
 	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\séèêàçù_\-\.\(\)\[\]\{\}']+$/;
 
@@ -52,7 +52,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		File missionDir = new File(ownerDir, Long.toString(missionId));
 		File propertyDir = new File(missionDir, Long.toString(bienId));
 		File collectionDir = new File(propertyDir, gallery.name);
-		Map<String, Map<Attachment, Set<Format>>> attachmentsByLabel = new TreeMap();
+		Map<Attachment, Set<Format>> attachments = new TreeMap();
 
 		collectionDir.mkdirs();
 		collectionDir.eachDir { formatDir ->
@@ -65,18 +65,15 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 					String extension = matcher[0][4];
 					Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, label, column, row, extension);
 
-					if(!attachmentsByLabel[label]) {
-						attachmentsByLabel[label] = [:];
+					if(!attachments[attachment]) {
+						attachments[attachment] = new TreeSet<Format>();
 					}
-					if(!attachmentsByLabel[label][attachment]) {
-						attachmentsByLabel[label][attachment] = [];
-					}
-					attachmentsByLabel[label][attachment] << new Format(formatDir.name);
+					attachments[attachment] << new Format(formatDir.name);
 				}
 			}
 		}
 
-		return cleanCollection(attachmentsByLabel);
+		return cleanCollection(attachments);
 	}
 
 	@Override
@@ -305,48 +302,47 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		return columns;
 	}
 
-	private Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> cleanCollection(Map<String, Map<Attachment, Set<Format>>> dirty) throws AttachmentPersistenceException {
+	private Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> cleanCollection(Map<Attachment, Set<Format>> dirty) throws AttachmentPersistenceException {
 		SortedMap<Integer, SortedMap<Integer, SortedMap<Attachment, SortedSet<Format>>>> dirtyByPosition = new TreeMap();
 		Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> clean = [:];
-		Attachment ref;
 
-		dirty.each { label, formatsByPosition ->
-			ref = formatsByPosition.keySet().first();
-			if(!dirtyByPosition[ref.displayColumn]) {
-				dirtyByPosition[ref.displayColumn] = new TreeMap();
+		dirty.each { attachment, formats ->
+			if(!dirtyByPosition[attachment.displayColumn]) {
+				dirtyByPosition[attachment.displayColumn] = new TreeMap();
 			}
-			if(!dirtyByPosition[ref.displayColumn][ref.displayRow]) {
-				dirtyByPosition[ref.displayColumn][ref.displayRow] = new TreeMap();
+			if(!dirtyByPosition[attachment.displayColumn][attachment.displayRow]) {
+				dirtyByPosition[attachment.displayColumn][attachment.displayRow] = new TreeMap();
 			}
-			if(!dirtyByPosition[ref.displayColumn][ref.displayRow][ref]) {
-				dirtyByPosition[ref.displayColumn][ref.displayRow][ref] = new TreeSet();
+			if(!dirtyByPosition[attachment.displayColumn][attachment.displayRow][attachment]) {
+				dirtyByPosition[attachment.displayColumn][attachment.displayRow][attachment] = new TreeSet();
 			}
-			formatsByPosition.each { attachment, formats ->
-				dirtyByPosition[ref.displayColumn][ref.displayRow][ref].addAll(formats);
-			}
+			dirtyByPosition[attachment.displayColumn][attachment.displayRow][attachment].addAll(formats);
 		}
 
-		dirtyByPosition.each { columnNbr, line ->
+		dirtyByPosition.each { columnNbr, columnCells ->
+			int i = 0;
 			if(!clean[columnNbr]) {
 				clean[columnNbr] = [:];
 			}
 
-			line.eachWithIndex { rowNbr, attachments, lineIndex ->
-				attachments.eachWithIndex { attachment, formats, i ->
+			columnCells.each { rowNbr, cell ->
+				cell.each { attachment, formats ->
 					Map<Attachment, Set<Format>> tmp;
-					if(columnNbr != attachment.displayColumn || lineIndex + i != attachment.displayRow) {
-						Attachment moved = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, columnNbr, lineIndex + i, attachment.fileExtension);
+					if(columnNbr != attachment.displayColumn || i != attachment.displayRow) {
+						Attachment moved = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, columnNbr, i, attachment.fileExtension);
 						moveFiles(attachment, moved, formats);
 						tmp = [(moved) : formats];
 					} else {
 						tmp = [(attachment) : formats];
 					}
-					clean[columnNbr][lineIndex + i] = tmp.entrySet().first();
+					clean[columnNbr][i++] = tmp.entrySet().first();
 				}
 			}
 		}
 
-		if(ref) {
+		Set<Attachment> attachments = dirty.keySet();
+		if(attachments) {
+			Attachment ref = attachments.first();
 			Attachment cover = getCover(ref.officeId, ref.missionId, ref.bienId);
 			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key != cover) {
 				setCover(ref.officeId, ref.missionId, ref.bienId, null);

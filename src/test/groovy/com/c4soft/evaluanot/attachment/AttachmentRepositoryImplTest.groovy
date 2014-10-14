@@ -62,7 +62,7 @@ class AttachmentRepositoryImplTest {
 	public void testThatInvalidCollectionsAreCorrectedAtLoadTime() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(4001L, 51L, 42L, PHOTO);
 		assertThat(actual.size(), is (1));
-		assertThat(actual[0].size(), is (2));
+		assertThat(actual[0].size(), is (12));
 		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 42L, PHOTO, 'missing 0_0', 0, 0, 'JPG')));
 		assertThat(actual[0][1].key, is(new Attachment(4001L, 51L, 42L, PHOTO, 'order collision', 0, 1, 'JPG')));
 	}
