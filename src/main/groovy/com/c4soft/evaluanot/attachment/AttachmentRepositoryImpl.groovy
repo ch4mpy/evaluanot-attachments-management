@@ -24,9 +24,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	 * Third group is attachment label
 	 * Last group is file extension
 	 */
-	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\séèêàçù_\-\.\(\)\[\]\{\}']+)\.(\w+)$/;
+	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\séèêàçù_\-\.\(\)\[\]\{\}',²°+&]+)\.(\w+)$/;
 
-	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\séèêàçù_\-\.\(\)\[\]\{\}']+$/;
+	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\séèêàçù_\-\.\(\)\[\]\{\}',²°+&]+$/;
 
 	private static final Pattern INPUT_FILE_NAME_PATTERN = ~/^(.+)\.(\w+)$/
 
