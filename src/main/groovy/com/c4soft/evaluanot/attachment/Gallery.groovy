@@ -78,6 +78,6 @@ class Gallery implements Comparable<Gallery>, Serializable {
 		if(!obj || !Gallery.isAssignableFrom(obj.class)) {
 			return false;
 		}
-		return compareTo(obj) != 0;
+		return compareTo(obj) == 0;
 	}
 }
