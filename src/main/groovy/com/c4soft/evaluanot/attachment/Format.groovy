@@ -34,20 +34,6 @@ class Format implements Comparable<Format>, Serializable {
 			return nameComp;
 		}
 
-		if(!maxWidth && other.maxWidth) {
-			return -1;
-		} else if(maxWidth) {
-			int widthComp = maxWidth.compareTo(other.maxWidth);
-			if(widthComp != 0) {
-				return widthComp;
-			}
-		}
-
-		if(!maxHeight && other.maxHeight) {
-			return -1;
-		} else if(maxHeight) {
-			return maxHeight.compareTo(other.maxHeight);
-		}
 		return 0;
 	}
 
@@ -55,8 +41,6 @@ class Format implements Comparable<Format>, Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((maxHeight == null) ? 0 : maxHeight.hashCode());
-		result = prime * result + ((maxWidth == null) ? 0 : maxWidth.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}

@@ -14,6 +14,8 @@ class GalleryTest {
 		assertEquals(0, a.compareTo(new Gallery('ab', (Set<Format>)[new Format('fullsize')])));
 		assertThat(a.compareTo(new Gallery('aa', (Set<Format>)[new Format('fullsize')])), is(greaterThan(0)));
 		assertThat(a.compareTo(new Gallery('ac', (Set<Format>)[new Format('fullsize')])), is(lessThan(0)));
+		assertThat(a.compareTo(new Gallery('ab', (Set<Format>)[])), is(greaterThan(0)));
+		assertThat(a.compareTo(new Gallery('ab', (Set<Format>)[new Format('fullsize'), new Format('grid')])), is(lessThan(0)));
 		assertThat(a.compareTo(null), is(greaterThan(0)));
 	}
 
@@ -24,6 +26,8 @@ class GalleryTest {
 		assertTrue(a.equals(new Gallery('ab', (Set<Format>)[new Format('fullsize')])));
 		assertFalse(a.equals(new Gallery('aa', (Set<Format>)[new Format('fullsize')])));
 		assertFalse(a.equals(new Gallery('ac', (Set<Format>)[new Format('fullsize')])));
+		assertFalse(a.equals(new Gallery('ac', (Set<Format>)[new Format('fullsize'), new Format('grid')])));
+		assertFalse(a.equals(new Gallery('ac', (Set<Format>)[])));
 		assertFalse(a.equals(null));
 	}
 
