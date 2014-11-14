@@ -32,7 +32,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private static final String META_DATA_FILE = 'meta-data.json';
 
 	final File rootDirectory;
-	
+
 	final String servletDocumentsPath;
 
 	public AttachmentRepositoryImpl(File rootDirectory, String servletDocumentsPath) {
@@ -230,7 +230,20 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Object raughData = new JsonSlurper().parse(metaDataFile);
 			Attachment cover;
 			try {
-				cover = new Attachment(raughData.cover.officeId, raughData.cover.missionId, raughData.cover.bienId, new Gallery(raughData.cover.gallery.name, raughData.cover.gallery.formats), raughData.cover.label, raughData.cover.displayColumn, raughData.cover.displayRow, raughData.cover.fileExtension);
+				Collection<Map> formats = raughData.cover.gallery.formats;
+				Set<Format> formatsSet = new HashSet<Format>(formats.size());
+				for(Map o : formats) {
+					formatsSet << new Format(o.name, o.maxWidth, o.maxHeight);
+				}
+				cover = new Attachment(
+						raughData.cover.officeId,
+						raughData.cover.missionId,
+						raughData.cover.bienId,
+						new Gallery(raughData.cover.gallery.name, formatsSet),
+						raughData.cover.label,
+						raughData.cover.displayColumn,
+						raughData.cover.displayRow,
+						raughData.cover.fileExtension);
 			} catch(Throwable t) {
 				cover = null;
 			}

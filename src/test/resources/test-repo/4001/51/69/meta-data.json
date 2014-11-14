@@ -4,6 +4,18 @@
         "officeId": 4001,
         "displayRow": 0,
         "gallery": {
+            "formats": [
+                {
+                    "maxHeight": null,
+                    "maxWidth": null,
+                    "name": "fullsize"
+                },
+                {
+                    "maxHeight": 300,
+                    "maxWidth": 300,
+                    "name": "thumbnail"
+                }
+            ],
             "name": "photo"
         },
         "label": "Belle montagne",

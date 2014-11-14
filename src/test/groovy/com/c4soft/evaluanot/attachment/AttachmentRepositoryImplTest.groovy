@@ -129,11 +129,23 @@ class AttachmentRepositoryImplTest {
 		assertThat(actual[FULLSIZE].path, containsString('1_0_Belle montagne.JPG'));
 		assertThat(actual[FULLSIZE].path, containsString(FULLSIZE.name));
 	}
-	
+
 	@Test
 	public void testGetServletPathsByFormat() {
 		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG'));
 		assertThat(actual.size(), is(1));
 		assertEquals('/documents/4001/51/69/photo/fullsize/0_0_virage+%C3%A0+droite.JPG', actual[FULLSIZE]);
+	}
+
+	@Test
+	public void testThatParseMetaDataFileRetunsValidMetaData() {
+		File metaDataFile = new File(repo.rootDirectory, '4001/51/69/meta-data.json');
+		BienMetaData metaData = repo.parseMetaData(metaDataFile);
+		assertNotNull(metaData);
+		assertEquals(69L, metaData.cover.bienId);
+		assertEquals(4001L, metaData.cover.officeId);
+		assertEquals(0, metaData.cover.displayRow);
+		assertEquals(2, metaData.cover.gallery.formats.size());
+		assertEquals('photo', metaData.cover.gallery.name);
 	}
 }
