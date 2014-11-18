@@ -103,6 +103,17 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
+	public void testThatMoveInsameColumnWorks() {
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'), 1, 1);
+		assertThat(actual.size(), is (2));
+		assertThat(actual[0].size(), is (1));
+		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG')));
+		assertThat(actual[1].size(), is (2));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 0, 'JPG')));
+		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 1, 'JPG')));
+	}
+
+	@Test
 	public void testThatRenameModifiesFileNameAndReturnsAttachmentWithNewLabel() {
 		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'), 'toto');
 		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'toto', 1, 1, 'JPG')));
