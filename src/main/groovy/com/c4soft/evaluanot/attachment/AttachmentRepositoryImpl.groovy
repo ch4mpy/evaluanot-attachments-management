@@ -142,10 +142,17 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> move(Attachment attachment, int newColumn, int newRow) throws AttachmentPersistenceException {
 		Map<Format, File> contentByFormat = getContentByFormat(attachment);
+		Map<Format, File> contentCopyByFormat = new TreeMap<Format, File>();
+		double random = Math.random();
 		contentByFormat.each { format, file ->
-			insert(format, file, new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, newColumn, newRow, attachment.fileExtension));
+			contentCopyByFormat[format] = new File(rootDirectory, format.name + '_' + random);
+			Files.copy(file.toPath(), contentCopyByFormat[format].toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
 		delete(attachment);
+		contentByFormat.each { format, file ->
+			insert(format, contentCopyByFormat[format], new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, newColumn, newRow, attachment.fileExtension));
+			contentCopyByFormat[format].delete();
+		}
 
 		return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
 	}
