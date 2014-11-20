@@ -8,6 +8,7 @@ import java.util.Map.Entry
 
 import org.junit.Before
 import org.junit.Test
+import org.junit.rules.ExpectedException;
 
 class AttachmentRepositoryImplTest {
 
@@ -83,6 +84,11 @@ class AttachmentRepositoryImplTest {
 		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 2, 'JPG')));
 	}
 
+	@Test(expected = IllegalArgumentException)
+	public void testThatCreateWithInvalidLabelThrowsIllegalArgumentException() {
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp\\'s monster (2)", 1, 1);
+	}
+
 	@Test
 	public void testThatDeleteActuallyRemovesFileFromFileSystemAndShiftsOtherColumnAttachments() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.delete(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
@@ -120,6 +126,11 @@ class AttachmentRepositoryImplTest {
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_toto.JPG').isFile());
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_toto.JPG').isFile());
+	}
+
+	@Test(expected = IllegalArgumentException)
+	public void testThatRenameWithInvalidLabelThrowsIllegalArgumentException() {
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'), 'to\\to');
 	}
 
 	@Test
