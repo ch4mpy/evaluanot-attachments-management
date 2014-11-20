@@ -363,7 +363,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(attachments) {
 			Attachment ref = attachments.first();
 			Attachment cover = getCover(ref.officeId, ref.missionId, ref.bienId);
-			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key != cover) {
+			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key.gallery.name == cover.gallery.name && clean[cover.displayColumn][cover.displayRow].key != cover) {
 				setCover(ref.officeId, ref.missionId, ref.bienId, null);
 			}
 		}
