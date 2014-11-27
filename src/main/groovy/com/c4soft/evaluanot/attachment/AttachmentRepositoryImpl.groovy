@@ -23,9 +23,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	 * Third group is attachment label
 	 * Last group is file extension
 	 */
-	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\sáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ_\-\.\(\)\[\]\{\}',²°+&]+)\.(\w+)$/;
+	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\sáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ_\-\.\(\)\[\]\{\}',²°+&~@!]+)\.(\w+)$/;
 
-	private static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\sáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ_\-\.\(\)\[\]\{\}',²°+&]+$/;
+	public static final Pattern REPO_FILE_LABEL_PATTERN = ~/^[\w\sáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ_\-\.\(\)\[\]\{\}',²°+&~@!]+$/;
 
 	private static final Pattern INPUT_FILE_NAME_PATTERN = ~/^(.+)\.(\w+)$/
 
