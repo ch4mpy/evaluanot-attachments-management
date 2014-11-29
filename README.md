@@ -7,6 +7,11 @@ Columns behave as stacks, so empty cells are removed and following cells are shi
 An effort was made for robustness against file system external modification and failure : provided repository implementation methods return what is actually available from the file system (and not what it expect to be there).
 To conclude, a file can be stored in different Format (fullsize, thubnail, etc.). As so we manipulate pairs of Attachment and set of available Formats
 
+1.0.2 released
+--------------
+I just released 1.0.2 wich might be production ready.<br>
+Latest improvements include making added & renamed attachments labels unique within a gallery and allow many more exotic characters within labels.
+
 Sample usage
 ------------
     @Controller
