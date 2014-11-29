@@ -84,6 +84,18 @@ class AttachmentRepositoryImplTest {
 		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 2, 'JPG')));
 	}
 
+	@Test
+	public void testThatCreateAttachmentWithSameLabelAtSamePositionActuallyCreatesNewAttachment() {
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
+		assertThat(actual[1].size(), is (3));
+		actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
+		assertThat(actual[1].size(), is (4));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG')));
+		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (3)", 1, 1, 'jpg').toString(), actual[1][1].key.toString());
+		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 2, 'jpg'), actual[1][2].key);
+		assertThat(actual[1][3].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 3, 'JPG')));
+	}
+
 	@Test(expected = IllegalArgumentException)
 	public void testThatCreateWithInvalidLabelThrowsIllegalArgumentException() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp\\'s monster (2)", 1, 1);
@@ -126,6 +138,15 @@ class AttachmentRepositoryImplTest {
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_toto.JPG').isFile());
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_toto.JPG').isFile());
+	}
+
+	@Test
+	public void testThatRenameMakesNewLabelUnique() {
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'), 'Belle montagne');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne (1)', 1, 1, 'JPG')));
+		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_Belle montagne (1).JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_Belle montagne (1).JPG').isFile());
 	}
 
 	@Test(expected = IllegalArgumentException)
