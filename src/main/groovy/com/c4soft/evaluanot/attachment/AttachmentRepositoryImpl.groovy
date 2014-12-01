@@ -184,8 +184,13 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 	@Override
 	public Attachment rename(Attachment attachment, String newLabel) throws AttachmentPersistenceException {
+		if(attachment == null) {
+			throw new IllegalArgumentException("can't rename null attachment");
+		}
 		if(!newLabel) {
 			throw new IllegalArgumentException("new label can't be empty");
+		} else if(newLabel == attachment.label) {
+			return attachment;
 		}
 		if(! REPO_FILE_LABEL_PATTERN.matcher(newLabel).matches()) {
 			throw new IllegalArgumentException("label can only be composed of latin1 characters, spaces, digits, underscores, dashes, dots and parenthesis");

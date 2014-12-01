@@ -149,6 +149,15 @@ class AttachmentRepositoryImplTest {
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_Belle montagne (1).JPG').isFile());
 	}
 
+	@Test
+	public void testThatRenameWithSameLabelActuallyKeepsIt() {
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'), 'eyes-wide-open');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG')));
+		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_eyes-wide-open.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_eyes-wide-open.JPG').isFile());
+	}
+
 	@Test(expected = IllegalArgumentException)
 	public void testThatRenameWithInvalidLabelThrowsIllegalArgumentException() {
 		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'eyes-wide-open', 1, 1, 'JPG'), 'to\\to');
