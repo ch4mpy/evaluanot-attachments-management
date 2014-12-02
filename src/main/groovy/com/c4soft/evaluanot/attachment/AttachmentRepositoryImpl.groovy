@@ -74,7 +74,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 					}
 					attachments[attachment] << new Format(formatDir.name);
 				} else {
-					LOG.warning(file.name + " does not match " + REPO_FILE_NAME_PATTERN.pattern);
+					LOG.warning(it.name + " does not match " + REPO_FILE_NAME_PATTERN.pattern);
 				}
 			}
 		}
