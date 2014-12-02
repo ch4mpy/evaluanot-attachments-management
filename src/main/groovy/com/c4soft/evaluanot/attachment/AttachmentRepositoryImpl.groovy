@@ -9,6 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.Map.Entry
+import java.util.logging.Logger;
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -32,6 +33,8 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private static final Pattern LABEl_UNICITY_PATTERN = ~/^(.+)\((\d+)\)$/
 
 	private static final String META_DATA_FILE = 'meta-data.json';
+	
+	private static final Logger LOG = Logger.getLogger(AttachmentRepositoryImpl.class.name);
 
 	final File rootDirectory;
 
@@ -70,6 +73,8 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 						attachments[attachment] = new TreeSet<Format>();
 					}
 					attachments[attachment] << new Format(formatDir.name);
+				} else {
+					LOG.warning(file.name + " does not match " + REPO_FILE_NAME_PATTERN.pattern);
 				}
 			}
 		}
