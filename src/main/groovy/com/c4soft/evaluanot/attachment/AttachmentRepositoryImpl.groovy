@@ -4,16 +4,16 @@ import groovy.io.FileType
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
-import java.nio.charset.Charset;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileAlreadyExistsException;
+import java.nio.charset.Charset
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.DirectoryNotEmptyException
+import java.nio.file.FileAlreadyExistsException
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.Map.Entry
-import java.util.logging.Logger;
+import java.util.logging.Logger
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -418,7 +418,12 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	private void copyFile(Path fromPath, Path toPath) throws AttachmentPersistenceException {
 		try {
 			new File(toPath.parent.toString()).mkdirs();
-			Files.copy(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
+			DataInputStream from = new File(fromPath.toString()).newDataInputStream();
+			DataOutputStream to = new File(toPath.toString()).newDataOutputStream();
+			to << from;
+			from.close();
+			to.close();
+//			Files.copy(fromPath.toUri(), toPath.toUri(), StandardCopyOption.REPLACE_EXISTING);
 		} catch(IOException | SecurityException t) {
 			throw new AttachmentPersistenceException('An error occured while copying ' + fromPath + ' to ' + toPath, t);
 		}
