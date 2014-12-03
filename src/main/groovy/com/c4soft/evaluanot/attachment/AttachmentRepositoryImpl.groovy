@@ -4,6 +4,7 @@ import groovy.io.FileType
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
+import java.nio.charset.Charset;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
@@ -427,12 +428,13 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		formats.each {	format ->
 			Path fromPath = fsPath(from, format);
 			Path toPath = fsPath(to, format);
-//			try {
+			try {
 				new File(toPath.parent.toString()).mkdirs();
 				Files.move(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
-//			} catch(UnsupportedOperationException | FileAlreadyExistsException | DirectoryNotEmptyException | AtomicMoveNotSupportedException | IOException | SecurityException t) {
-//				throw new AttachmentPersistenceException('An error occured while moving ' + fromPath + ' to ' + toPath, t);
-//			}
+			} catch(UnsupportedOperationException | FileAlreadyExistsException | DirectoryNotEmptyException | AtomicMoveNotSupportedException | IOException | SecurityException t) {
+				LOG.warning("failed to create file with defaultCharset: " + Charset.defaultCharset());
+				throw new AttachmentPersistenceException('An error occured while moving ' + fromPath + ' to ' + toPath, t);
+			}
 		}
 	}
 }
