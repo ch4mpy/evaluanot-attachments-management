@@ -1,4 +1,20 @@
 {
+    "labelsByGalleryNameAndColumnAndRow": {
+    	"ign": {
+    		"0": {
+    			"0": "virage à droite"
+    		}
+    	},
+    	"photo": {
+    		"0": {
+    			"0": "virage à droite"
+    		},
+    		"1": {
+    			"0": "Belle montagne",
+    			"1": "Jérôme"
+    		}
+    	}
+    },
     "cover": {
         "bienId": 69,
         "officeId": 4001,
@@ -6,14 +22,14 @@
         "gallery": {
             "formats": [
                 {
-                    "maxHeight": null,
-                    "maxWidth": null,
-                    "name": "fullsize"
-                },
-                {
                     "maxHeight": 300,
                     "maxWidth": 300,
                     "name": "thumbnail"
+                },
+                {
+                    "maxHeight": null,
+                    "maxWidth": null,
+                    "name": "fullsize"
                 }
             ],
             "name": "photo"
