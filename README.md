@@ -7,6 +7,11 @@ Columns behave as stacks, so empty cells are removed and following cells are shi
 An effort was made for robustness against file system external modification and failure : provided repository implementation methods return what is actually available from the file system (and not what it expect to be there).<br>
 To conclude, a file can be stored in different Format (fullsize, thubnail, etc.). As so we manipulate pairs of Attachment and set of available Formats
 
+1.1.0 released
+--------------
+I just released A new version whith an other way to store attachements labels: inside collections JSON meta-data file instead of physical file names.<br>
+Later solution was close to impossible to get working accross platforms and JVMs.
+
 1.0.2 released
 --------------
 I just released 1.0.2 wich might be production ready.<br>
