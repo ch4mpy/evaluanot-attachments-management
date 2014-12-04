@@ -239,13 +239,13 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		String uniqueLabel = getUniqueLabel(allAttachments, newLabel);
 
 		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
+		metaData.setLabel(newAttachment.gallery.name, newAttachment.displayColumn, newAttachment.displayRow, newAttachment.label);
 
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
 		if(cover?.displayColumn == newAttachment.displayColumn && cover?.displayRow == newAttachment.displayRow && cover?.gallery == newAttachment.gallery) {
 			metaData.cover =  newAttachment;
 		}
 
-		moveFiles(attachment, newAttachment, getContentByFormat(attachment).keySet());
 		return newAttachment;
 	}
 

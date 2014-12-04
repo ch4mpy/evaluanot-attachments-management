@@ -127,9 +127,9 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
-	public void testThatRenameModifiesFileNameAndReturnsAttachmentWithNewLabel() {
-		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'), 'toto');
-		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'toto', 1, 1, 'JPG')));
+	public void testThatRenameReturnsAttachmentWithNewLabel() {
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'), '/\\ en forêt');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, '/\\ en forêt', 1, 1, 'JPG')));
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1.JPG').isFile());
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1.JPG').isFile());
