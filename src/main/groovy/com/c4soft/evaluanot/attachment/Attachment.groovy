@@ -7,6 +7,8 @@ import groovy.json.JsonBuilder
  * Evalu@not attached document properties
  */
 class Attachment implements Comparable<Attachment>, Serializable {
+	
+	final String id;
 
 	final long officeId;
 
@@ -24,8 +26,9 @@ class Attachment implements Comparable<Attachment>, Serializable {
 
 	final String fileExtension;
 
-	public Attachment(long officeId, long missionId, long bienId, Gallery gallery, String label, int displayColumn, int displayRow, String fileExtension) {
+	public Attachment(long officeId, long missionId, long bienId, Gallery gallery, String id, String label, int displayColumn, int displayRow, String fileExtension) {
 		super();
+		this.id = id;
 		this.officeId = officeId;
 		this.missionId = missionId;
 		this.bienId = bienId;
@@ -46,6 +49,7 @@ class Attachment implements Comparable<Attachment>, Serializable {
 		result = prime * result + ((gallery == null) ? 0 : gallery.hashCode());
 		result = prime * result + displayRow;
 		result = prime * result + displayColumn;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		result = prime * result + ((fileExtension == null) ? 0 : fileExtension.hashCode());
 		return result;
@@ -108,6 +112,13 @@ class Attachment implements Comparable<Attachment>, Serializable {
 		}
 		if(displayRow < o.displayRow) {
 			return -1;
+		}
+		if(id != o.id) {
+			if(id) {
+				return id.compareTo(o.id);
+			} else {
+				return -1;
+			}
 		}
 		if(label != o.label) {
 			if(label) {

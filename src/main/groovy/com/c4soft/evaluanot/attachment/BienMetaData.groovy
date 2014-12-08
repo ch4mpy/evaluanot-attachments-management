@@ -53,11 +53,16 @@ class BienMetaData implements Serializable {
 				for(Map o : formats) {
 					formatsSet << new Format(o.name, o.maxWidth, o.maxHeight);
 				}
+				String id = raughData.cover?.id
+				if(!id) {
+					id = UUID.randomUUID().toString();
+				}
 				cover = new Attachment(
 						raughData.cover.officeId,
 						raughData.cover.missionId,
 						raughData.cover.bienId,
 						new Gallery(raughData.cover.gallery.name, formatsSet),
+						id,
 						raughData.cover.label,
 						raughData.cover.displayColumn,
 						raughData.cover.displayRow,

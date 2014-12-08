@@ -25,10 +25,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	/*
 	 * First group is a column position
 	 * Second group is a row position
-	 * Third group is attachment label
+	 * Third group is attachment id
 	 * Last group is file extension
 	 */
-	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)\.(\w+)$/;
+	private static final Pattern REPO_FILE_NAME_PATTERN = ~/^(\d+)_(\d+)_([\w\-]+)\.(\w+)$/;
 
 	private static final Pattern INPUT_FILE_NAME_PATTERN = ~/^(.+)\.(\w+)$/
 	
@@ -74,9 +74,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				if(matcher.matches()) {
 					Integer column = Integer.valueOf(matcher[0][1]);
 					Integer row = Integer.valueOf(matcher[0][2]);
+					String id = matcher[0][3];
 					String label = metaData.getLabel(gallery.name, column, row);
-					String extension = matcher[0][3];
-					Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, label, column, row, extension);
+					String extension = matcher[0][4];
+					Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, id, label, column, row, extension);
 
 					if(!attachments[attachment]) {
 						attachments[attachment] = new TreeSet<Format>();
@@ -125,6 +126,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		}
 		
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, missionId, bienId, gallery);
+		
 		String uniqueLabel = getUniqueLabel(allAttachments, label);
 
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns;
@@ -143,8 +145,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(!inputMatcher.matches()) {
 			throw new IllegalArgumentException('provided file name must be composed of a name and an extension');
 		}
+		
+		String id = UUID.randomUUID().toString(); 
 
-		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, label, column, row, inputMatcher[0][2]);
+		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, id, label, column, row, inputMatcher[0][2]);
 		return insert(metaData, allAttachments, format, file, attachment);
 	}
 
@@ -175,7 +179,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 		for(int i = attachment.displayRow; i < columns[attachment.displayColumn].size() - 1; i++) {
 			Entry<Attachment, Set<Format>> shifted = columns[attachment.displayColumn][i+1];
-			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
+			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.id, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
 			if(cover == shifted) {
 				metaData.cover =  newAttachment;
 			}
@@ -210,7 +214,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		}
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAtachments = delete(metaData, attachment);
 		contentByFormat.each { format, file ->
-			insert(metaData, allAtachments, format, contentCopyByFormat[format], new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, newColumn, newRow, attachment.fileExtension));
+			insert(metaData, allAtachments, format, contentCopyByFormat[format], new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, newColumn, newRow, attachment.fileExtension));
 			contentCopyByFormat[format].delete();
 		}
 
@@ -238,7 +242,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
 		String uniqueLabel = getUniqueLabel(allAttachments, newLabel);
 
-		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
+		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
 		metaData.setLabel(newAttachment.gallery.name, newAttachment.displayColumn, newAttachment.displayRow, newAttachment.label);
 
 		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
@@ -324,7 +328,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(!attachment) {
 			return null;
 		}
-		return attachment.displayColumn + '_' + attachment.displayRow + '.' + attachment.fileExtension;
+		return attachment.displayColumn + '_' + attachment.displayRow + '_' + attachment.id + '.' + attachment.fileExtension;
 	}
 
 	private Map<Format, File> getFilesByFormats(File collectionDir, Attachment attachment) {
@@ -355,7 +359,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		} else {
 			for(int i = allAttachments[attachment.displayColumn].size(); i > attachment.displayRow; i--) {
 				Attachment before = allAttachments[attachment.displayColumn][i-1].key;
-				Attachment after = new Attachment(before.officeId, before.missionId, before.bienId, before.gallery, before.label, before.displayColumn, i, before.fileExtension);
+				Attachment after = new Attachment(before.officeId, before.missionId, before.bienId, before.gallery, before.id, before.label, before.displayColumn, i, before.fileExtension);
 				allAttachments[attachment.displayColumn][i] = [(after) : allAttachments[attachment.displayColumn][i-1].value].entrySet().first();
 				moveFiles(before, after, allAttachments[attachment.displayColumn][i-1].value);
 				metaData.setLabel(after.gallery.name, after.displayColumn, after.displayRow, after.label);
@@ -400,7 +404,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				cell.each { Attachment attachment, Set<Format> formats ->
 					Map<Attachment, Set<Format>> tmp;
 					if(columnNbr != attachment.displayColumn || i != attachment.displayRow) {
-						Attachment moved = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.label, columnNbr, i, attachment.fileExtension);
+						Attachment moved = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, columnNbr, i, attachment.fileExtension);
 						moveFiles(attachment, moved, formats);
 						metaData.setLabel(moved.gallery.name, moved.displayColumn, moved.displayRow, moved.label);
 						tmp = [(moved) : formats];

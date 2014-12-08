@@ -40,21 +40,21 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatValidCollectionsAreLoadedWithoutModifications() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(4001L, 51L, 69L, PHOTO);
-		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
+		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual.size(), is (2));
 		assertThat(actual[0].size(), is (1));
 
-		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG')));
+		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '12', 'virage à droite', 0, 0, 'JPG')));
 		assertThat(actual[0][0].value.size(), is (1));
 		assertThat(actual[0][0].value, containsInAnyOrder([FULLSIZE].toArray()));
 
 		assertThat(actual[1].size(), is (2));
 
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG')));
 		assertThat(actual[1][0].value.size(), is (1));
 		assertThat(actual[1][0].value, containsInAnyOrder([FULLSIZE].toArray()));
 
-		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG')));
+		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG')));
 		assertThat(actual[1][1].value.size(), is (2));
 		assertThat(actual[1][1].value, containsInAnyOrder([FULLSIZE, THUMBNAIL].toArray()));
 	}
@@ -64,8 +64,8 @@ class AttachmentRepositoryImplTest {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(4001L, 51L, 42L, PHOTO);
 		assertThat(actual.size(), is (1));
 		assertThat(actual[0].size(), is (10));
-		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 42L, PHOTO, '0_1', 0, 0, 'JPG')));
-		assertThat(actual[0][1].key, is(new Attachment(4001L, 51L, 42L, PHOTO, '0_2', 0, 1, 'JPG')));
+		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 42L, PHOTO, '10', '0_1', 0, 0, 'JPG')));
+		assertThat(actual[0][1].key, is(new Attachment(4001L, 51L, 42L, PHOTO, '8', '0_2', 0, 1, 'JPG')));
 	}
 
 	@Test
@@ -79,9 +79,9 @@ class AttachmentRepositoryImplTest {
 	public void testThatCreateInExistingColumnMovesExistingAttachments() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
 		assertThat(actual[1].size(), is (3));
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG')));
-		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1, 'jpg'), actual[1][1].key);
-		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 2, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG')));
+		assertThat(actual[1][1].key.toString(), containsString("Ch4mp's monster (2)"));
+		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 2, 'JPG')));
 	}
 
 	@Test
@@ -90,93 +90,93 @@ class AttachmentRepositoryImplTest {
 		assertThat(actual[1].size(), is (3));
 		actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
 		assertThat(actual[1].size(), is (4));
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG')));
-		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (3)", 1, 1, 'jpg').toString(), actual[1][1].key.toString());
-		assertEquals(new Attachment(4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 2, 'jpg'), actual[1][2].key);
-		assertThat(actual[1][3].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 3, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG')));
+		assertThat(actual[1][1].key.toString(), containsString("Ch4mp's monster (3)"));
+		assertThat(actual[1][2].key.toString(), containsString("Ch4mp's monster (2)"));
+		assertThat(actual[1][3].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 3, 'JPG')));
 	}
 
 	@Test
 	public void testThatDeleteActuallyRemovesFileFromFileSystemAndShiftsOtherColumnAttachments() {
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.delete(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.delete(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual[1].size(), is (1));
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 0, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG')));
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(2));
 	}
 
 	@Test
 	public void testThatMoveRenamesFilesAndReturnsNewAttachments() {
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'), 0, 0);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'), 0, 0);
 		assertThat(actual.size(), is (2));
 		assertThat(actual[0].size(), is (2));
-		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 0, 0, 'JPG')));
-		assertThat(actual[0][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 1, 'JPG')));
+		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 0, 0, 'JPG')));
+		assertThat(actual[0][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '12', 'virage à droite', 0, 1, 'JPG')));
 		assertThat(actual[1].size(), is (1));
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 0, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG')));
 	}
 
 	@Test
 	public void testThatMoveInsameColumnWorks() {
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'), 1, 1);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'), 1, 1);
 		assertThat(actual.size(), is (2));
 		assertThat(actual[0].size(), is (1));
-		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG')));
+		assertThat(actual[0][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '12', 'virage à droite', 0, 0, 'JPG')));
 		assertThat(actual[1].size(), is (2));
-		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 0, 'JPG')));
-		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 1, 'JPG')));
+		assertThat(actual[1][0].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG')));
+		assertThat(actual[1][1].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 1, 'JPG')));
 	}
 
 	@Test
 	public void testThatRenameReturnsAttachmentWithNewLabel() {
-		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'), '/\\ en forêt');
-		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, '/\\ en forêt', 1, 1, 'JPG')));
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'), '/\\ en forêt');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', '/\\ en forêt', 1, 1, 'JPG')));
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1.JPG').isFile());
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_14.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_14.JPG').isFile());
 	}
 
 	@Test
 	public void testThatRenameMakesNewLabelUnique() {
-		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'), 'Belle montagne');
-		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne (1)', 1, 1, 'JPG')));
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'), 'Belle montagne');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Belle montagne (1)', 1, 1, 'JPG')));
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1.JPG').isFile());
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_14.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_14.JPG').isFile());
 	}
 
 	@Test
 	public void testThatRenameWithSameLabelActuallyKeepsIt() {
-		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'), 'Jérôme');
-		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG')));
+		Attachment actual = repo.rename(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'), 'Jérôme');
+		assertThat(actual, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG')));
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1.JPG').isFile());
-		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_14.JPG').isFile());
+		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_14.JPG').isFile());
 	}
 
 	@Test
 	public void testThatGetContentReturnsActualFileFormats() {
-		Map<Format, File> actual = repo.getContentByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'Jérôme', 1, 1, 'JPG'));
+		Map<Format, File> actual = repo.getContentByFormat(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'));
 		assertThat(actual.size(), is(2));
-		assertThat(actual[FULLSIZE].path, containsString('1_1.JPG'));
+		assertThat(actual[FULLSIZE].path, containsString('1_1_14.JPG'));
 		assertThat(actual[FULLSIZE].path, containsString(FULLSIZE.name));
-		assertThat(actual[THUMBNAIL].path, containsString('1_1.JPG'));
+		assertThat(actual[THUMBNAIL].path, containsString('1_1_14.JPG'));
 		assertThat(actual[THUMBNAIL].path, containsString(THUMBNAIL.name));
 	}
 
 	@Test
 	public void testListFormats() {
 		File photoDir = new File(repo.rootDirectory, '4001/51/69/photo');
-		Map<Format, File> actual = repo.getFilesByFormats(photoDir, new Attachment(4001L, 51L, 69L, PHOTO, 'Belle montagne', 1, 0, 'JPG'));
+		Map<Format, File> actual = repo.getFilesByFormats(photoDir, new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual.size(), is(1));
-		assertThat(actual[FULLSIZE].path, containsString('1_0.JPG'));
+		assertThat(actual[FULLSIZE].path, containsString('1_0_13.JPG'));
 		assertThat(actual[FULLSIZE].path, containsString(FULLSIZE.name));
 	}
 
 	@Test
 	public void testGetServletPathsByFormat() {
-		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, 'virage à droite', 0, 0, 'JPG'));
+		Map<Format, String> actual = repo.getServletPathByFormat(new Attachment(4001L, 51L, 69L, PHOTO, '12', 'virage à droite', 0, 0, 'JPG'));
 		assertThat(actual.size(), is(1));
-		assertEquals('/documents/4001/51/69/photo/fullsize/0_0.JPG', actual[FULLSIZE]);
+		assertEquals('/documents/4001/51/69/photo/fullsize/0_0_12.JPG', actual[FULLSIZE]);
 	}
 
 	@Test
