@@ -127,17 +127,18 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, missionId, bienId, gallery);
 		
+		String id = UUID.randomUUID().toString();
 		String uniqueLabel = getUniqueLabel(allAttachments, label);
 
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns;
 		fileByFormat.each { format, file ->
-			columns = insert(metaData, allAttachments, format, file,  officeId, missionId, bienId, gallery, uniqueLabel, column, row);
+			columns = insert(metaData, allAttachments, format, file,  officeId, missionId, bienId, gallery, id, uniqueLabel, column, row);
 		}
 
 		return columns;
 	}
 
-	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(BienMetaData metaData, Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments, Format format, File file, long officeId, long missionId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
+	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(BienMetaData metaData, Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments, Format format, File file, long officeId, long missionId, long bienId, Gallery gallery, String id, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
 		if(!file?.isFile()) {
 			throw new IllegalArgumentException('provided file ' + file?.name + ' is not valid');
 		}
@@ -145,8 +146,6 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(!inputMatcher.matches()) {
 			throw new IllegalArgumentException('provided file name must be composed of a name and an extension');
 		}
-		
-		String id = UUID.randomUUID().toString(); 
 
 		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, id, label, column, row, inputMatcher[0][2]);
 		return insert(metaData, allAttachments, format, file, attachment);

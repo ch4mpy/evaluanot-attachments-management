@@ -2,9 +2,12 @@ package com.c4soft.evaluanot.attachment;
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
+import groovy.io.FileType;
 
 import java.nio.file.Files
 import java.util.Map.Entry
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Before
 import org.junit.Test
@@ -84,6 +87,26 @@ class AttachmentRepositoryImplTest {
 		assertThat(actual[1][2].key, is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 2, 'JPG')));
 	}
 
+	@Test
+	public void testThatCreateAttachmentCreatesOneFilePerFormat() {
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg"), (THUMBNAIL) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster", 1, 1);
+		File fullsizeDir = new File(repo.rootDirectory, '4001/51/69/' + PHOTO.name + '/' + FULLSIZE.name);
+		File thumbnailDir = new File(repo.rootDirectory, '4001/51/69/' + PHOTO.name + '/' + THUMBNAIL.name);
+		String fullsizeId, thumbnailId;
+		Pattern expectedPattern = ~/1_1_([\w\-]+)\.\w+/;
+		fullsizeDir.eachFileMatch(FileType.FILES, expectedPattern) {
+			Matcher m = expectedPattern.matcher(it.name);
+			fullsizeId = m[0]?.get(1);
+		}
+		thumbnailDir.eachFileMatch(FileType.FILES, expectedPattern) {
+			Matcher m = expectedPattern.matcher(it.name);
+			thumbnailId = m[0]?.get(1);
+		}
+		assert(fullsizeId);
+		assertEquals(fullsizeId, thumbnailId);
+	}
+	
+	
 	@Test
 	public void testThatCreateAttachmentWithSameLabelAtSamePositionActuallyCreatesNewAttachment() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.create([(FULLSIZE) : new File("target/test-classes/moto'_(1).jpg")], 4001L, 51L, 69L, PHOTO, "Ch4mp's monster (2)", 1, 1);
