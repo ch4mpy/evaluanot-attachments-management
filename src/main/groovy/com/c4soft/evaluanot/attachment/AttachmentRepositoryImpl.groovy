@@ -167,7 +167,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			return columns;
 		}
 
-		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
+		Attachment cover = metaData.cover;
 		if(cover == attachment) {
 			metaData.cover =  null;
 		}
@@ -206,15 +206,26 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Map<Format, File> contentByFormat = getContentByFormat(attachment);
 		Map<Format, File> contentCopyByFormat = new TreeMap<Format, File>();
 		double random = Math.random();
+		boolean updateCover = false;
+		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, newColumn, newRow, attachment.fileExtension);
+		if(attachment == metaData.cover) {
+			updateCover = true;
+		}
 		
 		contentByFormat.each { format, file ->
 			contentCopyByFormat[format] = new File(rootDirectory, format.name + '_' + random);
 			Files.copy(file.toPath(), contentCopyByFormat[format].toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
+		
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAtachments = delete(metaData, attachment);
+		
 		contentByFormat.each { format, file ->
-			insert(metaData, allAtachments, format, contentCopyByFormat[format], new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, newColumn, newRow, attachment.fileExtension));
+			insert(metaData, allAtachments, format, contentCopyByFormat[format], newAttachment);
 			contentCopyByFormat[format].delete();
+		}
+		
+		if(updateCover) {
+			metaData.cover = newAttachment;
 		}
 
 		return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
@@ -244,8 +255,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
 		metaData.setLabel(newAttachment.gallery.name, newAttachment.displayColumn, newAttachment.displayRow, newAttachment.label);
 
-		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
-		if(cover?.displayColumn == newAttachment.displayColumn && cover?.displayRow == newAttachment.displayRow && cover?.gallery == newAttachment.gallery) {
+		if(attachment == metaData.cover) {
 			metaData.cover =  newAttachment;
 		}
 
@@ -348,7 +358,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(BienMetaData metaData, Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments, Format format, File file, Attachment attachment) throws AttachmentPersistenceException {
-		Attachment cover = getCover(attachment.officeId, attachment.missionId, attachment.bienId);
+		Attachment cover = metaData.cover;
 
 		if(!allAttachments[attachment.displayColumn]) {
 			allAttachments[attachment.displayColumn] = [:];
@@ -418,7 +428,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Set<Attachment> attachments = dirty.keySet();
 		if(attachments) {
 			Attachment ref = attachments.first();
-			Attachment cover = getCover(ref.officeId, ref.missionId, ref.bienId);
+			Attachment cover = metaData.cover;
 			if(cover && clean[cover.displayColumn] && clean[cover.displayColumn][cover.displayRow] && clean[cover.displayColumn][cover.displayRow].key.gallery.name == cover.gallery.name && clean[cover.displayColumn][cover.displayRow].key != cover) {
 				metaData.cover = null;
 			}

@@ -139,6 +139,18 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
+	public void testThatMoveKeepsCover() {
+		Attachment beforeMove = new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG');
+		Attachment afterMove = new Attachment(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId, beforeMove.gallery, beforeMove.id, beforeMove.label, 0, 0, beforeMove.fileExtension);
+		
+		repo.setCover(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId, beforeMove);
+		
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(beforeMove, afterMove.displayColumn, afterMove.displayRow);
+		
+		assertThat(repo.getCover(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId), is(afterMove));
+	}
+
+	@Test
 	public void testThatMoveInsameColumnWorks() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'), 1, 1);
 		assertThat(actual.size(), is (2));
@@ -174,6 +186,14 @@ class AttachmentRepositoryImplTest {
 		assertThat(new File(repo.rootDirectory, '4001/51/69/photo/fullsize').list().length, is(3));
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/fullsize/1_1_14.JPG').isFile());
 		assertTrue(new File(repo.rootDirectory, '4001/51/69/photo/thumbnail/1_1_14.JPG').isFile());
+	}
+
+	@Test
+	public void testThatRenameKeepsCover() {
+		Attachment before = new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG');
+		repo.setCover(before.officeId, before.missionId, before.bienId, before);
+		Attachment after = repo.rename(before, 'hop');
+		assertThat(repo.getCover(before.officeId, before.missionId, before.bienId), is(after));
 	}
 
 	@Test
