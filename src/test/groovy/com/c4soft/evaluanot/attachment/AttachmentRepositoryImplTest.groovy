@@ -128,6 +128,13 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
+	public void testThatDeleteAttachmentAboveCoverKeepsCover() {
+		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'));
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.delete(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
+		assertThat(repo.getCover(4001L, 51L, 69L), is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG')));
+	}
+
+	@Test
 	public void testThatMoveRenamesFilesAndReturnsNewAttachments() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'), 0, 0);
 		assertThat(actual.size(), is (2));

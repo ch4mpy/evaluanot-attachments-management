@@ -179,7 +179,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		for(int i = attachment.displayRow; i < columns[attachment.displayColumn].size() - 1; i++) {
 			Entry<Attachment, Set<Format>> shifted = columns[attachment.displayColumn][i+1];
 			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.id, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
-			if(cover == shifted) {
+			if(cover == shifted.key) {
 				metaData.cover =  newAttachment;
 			}
 			columns[attachment.displayColumn][i] = [(newAttachment) : shifted.value].entrySet().first();
@@ -188,7 +188,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				metaData.setLabel(newAttachment.gallery.name, newAttachment.displayColumn, newAttachment.displayRow, newAttachment.label);
 			}
 		}
-				metaData.setLabel(attachment.gallery.name, attachment.displayColumn, columns[attachment.displayColumn].size() - 1, null);
+		metaData.setLabel(attachment.gallery.name, attachment.displayColumn, columns[attachment.displayColumn].size() - 1, null);
 		columns[attachment.displayColumn].remove(columns[attachment.displayColumn].size() - 1);
 
 		return columns;
@@ -217,10 +217,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			Files.copy(file.toPath(), contentCopyByFormat[format].toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
 		
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAtachments = delete(metaData, attachment);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = delete(metaData, attachment);
 		
 		contentByFormat.each { format, file ->
-			insert(metaData, allAtachments, format, contentCopyByFormat[format], newAttachment);
+			insert(metaData, allAttachments, format, contentCopyByFormat[format], newAttachment);
 			contentCopyByFormat[format].delete();
 		}
 		
