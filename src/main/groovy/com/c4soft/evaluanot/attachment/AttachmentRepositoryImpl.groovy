@@ -53,17 +53,17 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	@Override
-	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(long officeId, long missionId, long bienId, Gallery gallery) throws IllegalArgumentException {
-		BienMetaData metaData = readMetaData(officeId, missionId, bienId);
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>>  attachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, missionId, bienId, gallery);
-		writeMetaData(metaData, officeId, missionId, bienId);
+	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(long officeId, long mandateId, long bienId, Gallery gallery) throws IllegalArgumentException {
+		BienMetaData metaData = readMetaData(officeId, mandateId, bienId);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>>  attachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, mandateId, bienId, gallery);
+		writeMetaData(metaData, officeId, mandateId, bienId);
 		return attachments;
 	}
 	
-	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(BienMetaData metaData, long officeId, long missionId, long bienId, Gallery gallery) throws IllegalArgumentException {
+	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(BienMetaData metaData, long officeId, long mandateId, long bienId, Gallery gallery) throws IllegalArgumentException {
 		File ownerDir = new File(rootDirectory, Long.toString(officeId));
-		File missionDir = new File(ownerDir, Long.toString(missionId));
-		File propertyDir = new File(missionDir, Long.toString(bienId));
+		File mandateDir = new File(ownerDir, Long.toString(mandateId));
+		File propertyDir = new File(mandateDir, Long.toString(bienId));
 		File collectionDir = new File(propertyDir, gallery.name);
 		Map<Attachment, Set<Format>> attachments = new TreeMap();
 
@@ -77,7 +77,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 					String id = matcher[0][3];
 					String label = metaData.getLabel(gallery.name, column, row);
 					String extension = matcher[0][4];
-					Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, id, label, column, row, extension);
+					Attachment attachment = new Attachment(officeId, mandateId, bienId, gallery, id, label, column, row, extension);
 
 					if(!attachments[attachment]) {
 						attachments[attachment] = new TreeSet<Format>();
@@ -113,32 +113,32 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	@Override
-	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> create(Map<Format, File> fileByFormat, long officeId, long missionId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
-		BienMetaData metaData = readMetaData(officeId, missionId, bienId);
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> attachments = create(metaData, fileByFormat, officeId, missionId, bienId, gallery, label, column, row);
-		writeMetaData(metaData, officeId, missionId, bienId);
+	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> create(Map<Format, File> fileByFormat, long officeId, long mandateId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
+		BienMetaData metaData = readMetaData(officeId, mandateId, bienId);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> attachments = create(metaData, fileByFormat, officeId, mandateId, bienId, gallery, label, column, row);
+		writeMetaData(metaData, officeId, mandateId, bienId);
 		return attachments;
 	}
 	
-	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> create(BienMetaData metaData, Map<Format, File> fileByFormat, long officeId, long missionId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
+	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> create(BienMetaData metaData, Map<Format, File> fileByFormat, long officeId, long mandateId, long bienId, Gallery gallery, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
 		if(! fileByFormat) {
-			return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, missionId, bienId, gallery);
+			return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, mandateId, bienId, gallery);
 		}
 		
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, missionId, bienId, gallery);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, officeId, mandateId, bienId, gallery);
 		
 		String id = UUID.randomUUID().toString();
 		String uniqueLabel = getUniqueLabel(allAttachments, label);
 
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns;
 		fileByFormat.each { format, file ->
-			columns = insert(metaData, allAttachments, format, file,  officeId, missionId, bienId, gallery, id, uniqueLabel, column, row);
+			columns = insert(metaData, allAttachments, format, file,  officeId, mandateId, bienId, gallery, id, uniqueLabel, column, row);
 		}
 
 		return columns;
 	}
 
-	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(BienMetaData metaData, Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments, Format format, File file, long officeId, long missionId, long bienId, Gallery gallery, String id, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
+	private Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> insert(BienMetaData metaData, Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments, Format format, File file, long officeId, long mandateId, long bienId, Gallery gallery, String id, String label, int column, int row) throws IllegalArgumentException, AttachmentPersistenceException {
 		if(!file?.isFile()) {
 			throw new IllegalArgumentException('provided file ' + file?.name + ' is not valid');
 		}
@@ -147,20 +147,20 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			throw new IllegalArgumentException('provided file name must be composed of a name and an extension');
 		}
 
-		Attachment attachment = new Attachment(officeId, missionId, bienId, gallery, id, label, column, row, inputMatcher[0][2]);
+		Attachment attachment = new Attachment(officeId, mandateId, bienId, gallery, id, label, column, row, inputMatcher[0][2]);
 		return insert(metaData, allAttachments, format, file, attachment);
 	}
 
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> delete(Attachment attachment) {
-		BienMetaData metaData = readMetaData(attachment.officeId, attachment.missionId, attachment.bienId);
+		BienMetaData metaData = readMetaData(attachment.officeId, attachment.mandateId, attachment.bienId);
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> attachments = delete(metaData, attachment);
-		writeMetaData(metaData, attachment.officeId, attachment.missionId, attachment.bienId);
+		writeMetaData(metaData, attachment.officeId, attachment.mandateId, attachment.bienId);
 		return attachments;
 	}
 	
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> delete(BienMetaData metaData, Attachment attachment) {
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> columns = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery);
 		Set<Format> formats = columns[attachment.displayColumn][attachment.displayRow].value;
 
 		if(attachment != columns[attachment.displayColumn][attachment.displayRow].key) {
@@ -178,7 +178,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 		for(int i = attachment.displayRow; i < columns[attachment.displayColumn].size() - 1; i++) {
 			Entry<Attachment, Set<Format>> shifted = columns[attachment.displayColumn][i+1];
-			Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, shifted.key.gallery, shifted.key.id, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
+			Attachment newAttachment = new Attachment(attachment.officeId, attachment.mandateId, attachment.bienId, shifted.key.gallery, shifted.key.id, shifted.key.label, shifted.key.displayColumn, i, shifted.key.fileExtension);
 			if(cover == shifted.key) {
 				metaData.cover =  newAttachment;
 			}
@@ -196,9 +196,9 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 
 	@Override
 	public Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> move(Attachment attachment, int newColumn, int newRow) throws AttachmentPersistenceException {
-		BienMetaData metaData = readMetaData(attachment.officeId, attachment.missionId, attachment.bienId);
+		BienMetaData metaData = readMetaData(attachment.officeId, attachment.mandateId, attachment.bienId);
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> attachments = move(metaData, attachment, newColumn, newRow);
-		writeMetaData(metaData, attachment.officeId, attachment.missionId, attachment.bienId);
+		writeMetaData(metaData, attachment.officeId, attachment.mandateId, attachment.bienId);
 		return attachments;
 	}
 	
@@ -207,7 +207,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		Map<Format, File> contentCopyByFormat = new TreeMap<Format, File>();
 		double random = Math.random();
 		boolean updateCover = false;
-		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, newColumn, newRow, attachment.fileExtension);
+		Attachment newAttachment = new Attachment(attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, newColumn, newRow, attachment.fileExtension);
 		if(attachment == metaData.cover) {
 			updateCover = true;
 		}
@@ -228,14 +228,14 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			metaData.cover = newAttachment;
 		}
 
-		return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
+		return findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery);
 	}
 
 	@Override
 	public Attachment rename(Attachment attachment, String newLabel) throws AttachmentPersistenceException {
-		BienMetaData metaData = readMetaData(attachment.officeId, attachment.missionId, attachment.bienId);
+		BienMetaData metaData = readMetaData(attachment.officeId, attachment.mandateId, attachment.bienId);
 		Attachment renamed = rename(metaData, attachment, newLabel);
-		writeMetaData(metaData, attachment.officeId, attachment.missionId, attachment.bienId);
+		writeMetaData(metaData, attachment.officeId, attachment.mandateId, attachment.bienId);
 		return renamed;
 	}
 	
@@ -249,10 +249,10 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 			return attachment;
 		}
 		
-		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery);
+		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> allAttachments = findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(metaData, attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery);
 		String uniqueLabel = getUniqueLabel(allAttachments, newLabel);
 
-		Attachment newAttachment = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
+		Attachment newAttachment = new Attachment(attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery, attachment.id, uniqueLabel, attachment.displayColumn, attachment.displayRow, attachment.fileExtension);
 		metaData.setLabel(newAttachment.gallery.name, newAttachment.displayColumn, newAttachment.displayRow, newAttachment.label);
 
 		if(attachment == metaData.cover) {
@@ -287,14 +287,14 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		return formats;
 	}
 	
-	public BienMetaData readMetaData(long officeId, long missionId, long bienId) {
-		File metaDataFile = getMetaDataFile(officeId, missionId, bienId);
+	public BienMetaData readMetaData(long officeId, long mandateId, long bienId) {
+		File metaDataFile = getMetaDataFile(officeId, mandateId, bienId);
 		BienMetaData metaData = BienMetaData.parseMetaData(metaDataFile);
 		return metaData;
 	}
 	
-	public void writeMetaData(BienMetaData metaData, long officeId, long missionId, long bienId) {
-		File metaDataFile = getMetaDataFile(officeId, missionId, bienId);
+	public void writeMetaData(BienMetaData metaData, long officeId, long mandateId, long bienId) {
+		File metaDataFile = getMetaDataFile(officeId, mandateId, bienId);
 		if(!metaDataFile.isFile()) {
 			metaDataFile.createNewFile();
 		}
@@ -303,25 +303,25 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 	}
 
 	@Override
-	public void setCover(long officeId, long missionId, long bienId, Attachment attachment) {
+	public void setCover(long officeId, long mandateId, long bienId, Attachment attachment) {
 		if(attachment && (attachment.officeId != officeId || attachment.bienId != bienId || attachment.bienId != bienId)) {
 			return;
 		}
-		BienMetaData metaData = readMetaData(officeId, missionId, bienId);
+		BienMetaData metaData = readMetaData(officeId, mandateId, bienId);
 		metaData.cover =  attachment;
-		writeMetaData(metaData, officeId, missionId, bienId);
+		writeMetaData(metaData, officeId, mandateId, bienId);
 	}
 
 	@Override
-	public Attachment getCover(long officeId, long missionId, long bienId) {
-		BienMetaData metaData = readMetaData(officeId, missionId, bienId);
+	public Attachment getCover(long officeId, long mandateId, long bienId) {
+		BienMetaData metaData = readMetaData(officeId, mandateId, bienId);
 		return metaData.cover;
 	}
 
-	private File getMetaDataFile(long officeId, long missionId, long bienId) {
+	private File getMetaDataFile(long officeId, long mandateId, long bienId) {
 		File officeDir = new File(rootDirectory.absolutePath, Long.toString(officeId));
-		File missionDir = new File(officeDir, Long.toString(missionId));
-		File bienDir = new File(missionDir, Long.toString(bienId));
+		File mandateDir = new File(officeDir, Long.toString(mandateId));
+		File bienDir = new File(mandateDir, Long.toString(bienId));
 		bienDir.mkdirs();
 		return new File(bienDir, META_DATA_FILE);
 	}
@@ -330,7 +330,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		if(!attachment) {
 			return null;
 		}
-		return FileSystems.getDefault().getPath(root, Long.toString(attachment.officeId), Long.toString(attachment.missionId), Long.toString(attachment.bienId), attachment.gallery.name);
+		return FileSystems.getDefault().getPath(root, Long.toString(attachment.officeId), Long.toString(attachment.mandateId), Long.toString(attachment.bienId), attachment.gallery.name);
 	}
 
 	private String repoFileName(Attachment attachment) {
@@ -368,7 +368,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 		} else {
 			for(int i = allAttachments[attachment.displayColumn].size(); i > attachment.displayRow; i--) {
 				Attachment before = allAttachments[attachment.displayColumn][i-1].key;
-				Attachment after = new Attachment(before.officeId, before.missionId, before.bienId, before.gallery, before.id, before.label, before.displayColumn, i, before.fileExtension);
+				Attachment after = new Attachment(before.officeId, before.mandateId, before.bienId, before.gallery, before.id, before.label, before.displayColumn, i, before.fileExtension);
 				allAttachments[attachment.displayColumn][i] = [(after) : allAttachments[attachment.displayColumn][i-1].value].entrySet().first();
 				moveFiles(before, after, allAttachments[attachment.displayColumn][i-1].value);
 				metaData.setLabel(after.gallery.name, after.displayColumn, after.displayRow, after.label);
@@ -413,7 +413,7 @@ class AttachmentRepositoryImpl implements AttachmentRepository {
 				cell.each { Attachment attachment, Set<Format> formats ->
 					Map<Attachment, Set<Format>> tmp;
 					if(columnNbr != attachment.displayColumn || i != attachment.displayRow) {
-						Attachment moved = new Attachment(attachment.officeId, attachment.missionId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, columnNbr, i, attachment.fileExtension);
+						Attachment moved = new Attachment(attachment.officeId, attachment.mandateId, attachment.bienId, attachment.gallery, attachment.id, attachment.label, columnNbr, i, attachment.fileExtension);
 						moveFiles(attachment, moved, formats);
 						metaData.setLabel(moved.gallery.name, moved.displayColumn, moved.displayRow, moved.label);
 						tmp = [(moved) : formats];

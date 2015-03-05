@@ -59,7 +59,7 @@ class BienMetaData implements Serializable {
 				}
 				cover = new Attachment(
 						raughData.cover.officeId,
-						raughData.cover.missionId,
+						raughData.cover.mandateId,
 						raughData.cover.bienId,
 						new Gallery(raughData.cover.gallery.name, formatsSet),
 						id,

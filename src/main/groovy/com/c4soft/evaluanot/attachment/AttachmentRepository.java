@@ -13,20 +13,20 @@ public interface AttachmentRepository {
 	/**
 	 * Retrieves all attachments from a specific collection
 	 * @param officeId
-	 * @param missionId
+	 * @param mandateId
 	 * @param bienId
 	 * @param gallery should be an enumerated value
 	 * @return all attachments from specified collection mapped by display column and display row
 	 */
 	Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(
-			long officeId, long missionId, long bienId, Gallery gallery) throws IllegalArgumentException;
+			long officeId, long mandateId, long bienId, Gallery gallery) throws IllegalArgumentException;
 
 	/**
 	 * Adds an attachment to the repository. Provided files are copied into the repo (and not moved)., so you might want
 	 * to delete input file after adding it to the repo.
 	 * @param fileByFormat file in different formats (i.e. fullsize, thumbnail, ...)
 	 * @param officeId
-	 * @param missionId
+	 * @param mandateId
 	 * @param bienId
 	 * @param gallery should be an enumerated value
 	 * @param label
@@ -35,7 +35,7 @@ public interface AttachmentRepository {
 	 * @return updated collection of attachments
 	 */
 	Map<Integer, Map<Integer, Entry<Attachment, Set<Format>>>> create(Map<Format, File> fileByFormat, long officeId,
-			long missionId, long bienId, Gallery gallery, String label, int column, int row)
+			long mandateId, long bienId, Gallery gallery, String label, int column, int row)
 			throws IllegalArgumentException, AttachmentPersistenceException;
 
 	/**
@@ -86,10 +86,10 @@ public interface AttachmentRepository {
 	 * Set which attached document should be the report cover
 	 * @param attachment
 	 */
-	void setCover(long officeId, long missionId, long bienId, Attachment attachment);
+	void setCover(long officeId, long mandateId, long bienId, Attachment attachment);
 
 	/**
 	 * @return report cover as previously set
 	 */
-	Attachment getCover(long officeId, long missionId, long bienId);
+	Attachment getCover(long officeId, long mandateId, long bienId);
 }

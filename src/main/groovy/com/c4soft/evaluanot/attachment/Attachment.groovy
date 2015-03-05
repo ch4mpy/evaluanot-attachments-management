@@ -12,7 +12,7 @@ class Attachment implements Comparable<Attachment>, Serializable {
 
 	final long officeId;
 
-	final long missionId;
+	final long mandateId;
 
 	final long bienId;
 
@@ -26,11 +26,11 @@ class Attachment implements Comparable<Attachment>, Serializable {
 
 	final String fileExtension;
 
-	public Attachment(long officeId, long missionId, long bienId, Gallery gallery, String id, String label, int displayColumn, int displayRow, String fileExtension) {
+	public Attachment(long officeId, long mandateId, long bienId, Gallery gallery, String id, String label, int displayColumn, int displayRow, String fileExtension) {
 		super();
 		this.id = id;
 		this.officeId = officeId;
-		this.missionId = missionId;
+		this.mandateId = mandateId;
 		this.bienId = bienId;
 		this.gallery = gallery;
 		this.label = label;
@@ -44,7 +44,7 @@ class Attachment implements Comparable<Attachment>, Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + officeId;
-		result = prime * result + missionId;
+		result = prime * result + mandateId;
 		result = prime * result + bienId;
 		result = prime * result + ((gallery == null) ? 0 : gallery.hashCode());
 		result = prime * result + displayRow;
@@ -82,10 +82,10 @@ class Attachment implements Comparable<Attachment>, Serializable {
 		if(officeId < o.officeId) {
 			return -1;
 		}
-		if(missionId > o.missionId) {
+		if(mandateId > o.mandateId) {
 			return 1;
 		}
-		if(missionId < o.missionId) {
+		if(mandateId < o.mandateId) {
 			return -1;
 		}
 		if(bienId > o.bienId) {

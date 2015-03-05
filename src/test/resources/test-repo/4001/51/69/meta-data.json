@@ -36,7 +36,7 @@
         },
         "label": "Belle montagne",
         "displayColumn": 1,
-        "missionId": 51,
+        "mandateId": 51,
         "fileExtension": "JPG"
     }
 }

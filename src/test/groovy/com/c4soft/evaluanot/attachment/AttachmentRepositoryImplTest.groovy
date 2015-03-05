@@ -148,13 +148,13 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatMoveKeepsCover() {
 		Attachment beforeMove = new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG');
-		Attachment afterMove = new Attachment(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId, beforeMove.gallery, beforeMove.id, beforeMove.label, 0, 0, beforeMove.fileExtension);
+		Attachment afterMove = new Attachment(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId, beforeMove.gallery, beforeMove.id, beforeMove.label, 0, 0, beforeMove.fileExtension);
 		
-		repo.setCover(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId, beforeMove);
+		repo.setCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId, beforeMove);
 		
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(beforeMove, afterMove.displayColumn, afterMove.displayRow);
 		
-		assertThat(repo.getCover(beforeMove.officeId, beforeMove.missionId, beforeMove.bienId), is(afterMove));
+		assertThat(repo.getCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId), is(afterMove));
 	}
 
 	@Test
@@ -198,9 +198,9 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatRenameKeepsCover() {
 		Attachment before = new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG');
-		repo.setCover(before.officeId, before.missionId, before.bienId, before);
+		repo.setCover(before.officeId, before.mandateId, before.bienId, before);
 		Attachment after = repo.rename(before, 'hop');
-		assertThat(repo.getCover(before.officeId, before.missionId, before.bienId), is(after));
+		assertThat(repo.getCover(before.officeId, before.mandateId, before.bienId), is(after));
 	}
 
 	@Test

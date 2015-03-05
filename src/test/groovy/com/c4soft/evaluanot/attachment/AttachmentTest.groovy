@@ -22,7 +22,7 @@ class AttachmentTest {
 		assertThat(attachment.equals(null), is(false));
 
 		JsonSlurper json = new JsonSlurper();
-		assertThat(attachment.equals(json.parseText('{"officeId": 4001, "missionId": 51, "bienId": 69, "collectionType": "photos", "label": "image", "displayRow": 0, "displayColumn": 1, "fileExtension": "jpg"}')), is(false));
+		assertThat(attachment.equals(json.parseText('{"officeId": 4001, "mandateId": 51, "bienId": 69, "collectionType": "photos", "label": "image", "displayRow": 0, "displayColumn": 1, "fileExtension": "jpg"}')), is(false));
 
 		assertThat(attachment.equals(new Attachment(4001L, 51L, 69L, PHOTOS, '42', 'image', 0, 1, 'jpg')), is(true));
 	}
@@ -65,6 +65,7 @@ class AttachmentTest {
 		assertEquals(/{
     "bienId": 69,
     "officeId": 4001,
+    "mandateId": 51,
     "id": "42",
     "displayRow": 2,
     "gallery": {
@@ -79,7 +80,6 @@ class AttachmentTest {
     },
     "label": "image",
     "displayColumn": 1,
-    "missionId": 51,
     "fileExtension": "jpg"
 }/, new Attachment(4001L, 51L, 69L, PHOTOS, '42', 'image', 1, 2, 'jpg').toString());
 	}

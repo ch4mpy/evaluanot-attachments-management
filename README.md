@@ -1,7 +1,7 @@
 evaluanot-attachments-management
 ================================
 A small library made to store Evalu@not attached documents in a file system.<br>
-Those documents are grouped by officeId, missionId, bienId and Gallery (maps, pictures, etc.).<br>
+Those documents are grouped by officeId, mandateId, bienId and Gallery (maps, pictures, etc.).<br>
 Attachments within a group can be ordered in columns and rows.<br>
 Columns behave as stacks, so empty cells are removed and following cells are shifted.<br>
 An effort was made for robustness against file system external modification and failure : provided repository implementation methods return what is actually available from the file system (and not what it expect to be there).<br>
