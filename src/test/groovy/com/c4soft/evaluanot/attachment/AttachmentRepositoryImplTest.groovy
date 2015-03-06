@@ -43,7 +43,7 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatValidCollectionsAreLoadedWithoutModifications() {
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.findByOfficeIdAndMissionIdAndBienIdAndGalleryMapByColumnAndRow(4001L, 51L, 69L, PHOTO);
-		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
+		repo.setBienCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
 		assertThat(actual.size(), is (2));
 		assertThat(actual[0].size(), is (1));
 
@@ -128,10 +128,14 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
-	public void testThatDeleteAttachmentAboveCoverKeepsCover() {
-		repo.setCover(4001L, 51L, 69L, new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG'));
+	public void testThatDeleteAttachmentAboveCoverKeepsCovers() {
+		Attachment beforeDelete = new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG');
+		Attachment afterDelete = new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG');
+		repo.setBienCover(4001L, 51L, 69L, beforeDelete);
+		repo.setMandateCover(4001L, 51L, beforeDelete);
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.delete(new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG'));
-		assertThat(repo.getCover(4001L, 51L, 69L), is(new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 0, 'JPG')));
+		assertThat(repo.getBienCover(4001L, 51L, 69L), is(afterDelete));
+		assertThat(repo.getMandateCover(4001L, 51L), is(afterDelete));
 	}
 
 	@Test
@@ -146,15 +150,17 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
-	public void testThatMoveKeepsCover() {
+	public void testThatMoveKeepsCovers() {
 		Attachment beforeMove = new Attachment(4001L, 51L, 69L, PHOTO, '13', 'Belle montagne', 1, 0, 'JPG');
 		Attachment afterMove = new Attachment(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId, beforeMove.gallery, beforeMove.id, beforeMove.label, 0, 0, beforeMove.fileExtension);
 		
-		repo.setCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId, beforeMove);
+		repo.setBienCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId, beforeMove);
+		repo.setMandateCover(beforeMove.officeId, beforeMove.mandateId, beforeMove);
 		
 		Map<Integer, Map<Integer,  Entry<Attachment, Set<Format>>>> actual = repo.move(beforeMove, afterMove.displayColumn, afterMove.displayRow);
 		
-		assertThat(repo.getCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId), is(afterMove));
+		assertThat(repo.getBienCover(beforeMove.officeId, beforeMove.mandateId, beforeMove.bienId), is(afterMove));
+		assertThat(repo.getMandateCover(beforeMove.officeId, beforeMove.mandateId), is(afterMove));
 	}
 
 	@Test
@@ -196,11 +202,16 @@ class AttachmentRepositoryImplTest {
 	}
 
 	@Test
-	public void testThatRenameKeepsCover() {
+	public void testThatRenameKeepsCovers() {
 		Attachment before = new Attachment(4001L, 51L, 69L, PHOTO, '14', 'Jérôme', 1, 1, 'JPG');
-		repo.setCover(before.officeId, before.mandateId, before.bienId, before);
+		
+		repo.setBienCover(before.officeId, before.mandateId, before.bienId, before);
+		repo.setMandateCover(before.officeId, before.mandateId, before);
+		
 		Attachment after = repo.rename(before, 'hop');
-		assertThat(repo.getCover(before.officeId, before.mandateId, before.bienId), is(after));
+		
+		assertThat(repo.getBienCover(before.officeId, before.mandateId, before.bienId), is(after));
+		assertThat(repo.getMandateCover(before.officeId, before.mandateId), is(after));
 	}
 
 	@Test
@@ -232,7 +243,7 @@ class AttachmentRepositoryImplTest {
 	@Test
 	public void testThatParseMetaDataFileRetunsValidMetaData() {
 		File metaDataFile = new File(repo.rootDirectory, '4001/51/69/meta-data.json');
-		BienMetaData metaData = BienMetaData.parseMetaData(metaDataFile);
+		BienMetaData metaData = BienMetaData.parseMetaDataFile(metaDataFile);
 		assertNotNull(metaData);
 		assertEquals(69L, metaData.cover.bienId);
 		assertEquals(4001L, metaData.cover.officeId);
